@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
 import shutil
 import os
-from fastapi import File, UploadFile
+from fastapi import File, UploadFile, HTTPException
 from src.handlepdf import extract_text_from_pdf
 from models import Resume
 from shared import get_db,engine,Base
@@ -28,7 +28,31 @@ async def hello_page(request: Request):
 
 
 @app.post("/upload_resume")
-async def upload_resume(file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def upload_resume(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    
+    # Validation
+    ALLOWED_TYPES = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+    MAX_SIZE = 5 * 1024 * 1024  # 5MB
+
+    if file.content_type not in ALLOWED_TYPES:
+        return templates.TemplateResponse(
+            request=request,
+            name="upload_resume.html",
+            context={"company_name": "YAHA", "error": "Invalid file type. Only PDF and DOC/DOCX allowed."}
+        )
+
+    # Check size
+    file.file.seek(0, 2)
+    size = file.file.tell()
+    file.file.seek(0)
+    
+    if size > MAX_SIZE:
+        return templates.TemplateResponse(
+            request=request,
+            name="upload_resume.html",
+            context={"company_name": "YAHA", "error": "File too large. Max size is 5MB."}
+        )
+
     upload_dir = "uploads"
     os.makedirs(upload_dir, exist_ok=True)
     
@@ -36,7 +60,14 @@ async def upload_resume(file: UploadFile = File(...), db: Session = Depends(get_
     with open(file_location, "wb+") as file_object:
         shutil.copyfileobj(file.file, file_object)
         
-    text = extract_text_from_pdf(file_location)
+    if file.content_type == "application/pdf":
+        try:
+            text = extract_text_from_pdf(file_location)
+        except Exception:
+            text = "" # Fail gracefully
+    else:
+        text = "" # Placeholder for DOC/DOCX extraction later
+
     resume_test = Resume(
         resume_text=text,
         id_text=file.filename
