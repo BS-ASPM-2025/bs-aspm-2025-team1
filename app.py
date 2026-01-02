@@ -6,10 +6,11 @@ from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
 import shutil
 import os
-from fastapi import File, UploadFile, HTTPException
+from fastapi import File, UploadFile, HTTPException, Form
 from src.handlepdf import extract_text_from_pdf
-from models import Resume
+from models import Resume, Job
 from shared import get_db,engine,Base
+import uuid
 
 templates = Jinja2Templates(directory="templates")
 app = FastAPI(title="Resume–Job Matcher")
@@ -18,12 +19,55 @@ app = FastAPI(title="Resume–Job Matcher")
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     yield
+
+@app.get("/post_job", include_in_schema=False)
+async def post_job_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="post_job.html",
+        context={"company_name": "ResMe"}
+    )
+
+@app.post("/post_job")
+async def post_job(
+    request: Request,
+    title: str = Form(...),
+    company: str = Form(...),
+    degree: str = Form(...),
+    experience: str = Form(...),
+    required_skills: str = Form(...),
+    job_text: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    # Combine fields for match algorithm text
+    combined_text = f"Title: {title}\nCompany: {company}\nSkills: {required_skills}\nDegree: {degree}\nExperience: {experience}\n\nDescription:\n{job_text}"
+    
+    # Create simple ID (in real app use UUID)
+    id_text = str(uuid.uuid4())
+
+    new_job = Job(
+        title=title,
+        company=company,
+        degree=degree,
+        experience=experience,
+        required_skills=required_skills,
+        job_text=combined_text, # Using combined text for searching logic compatibility
+        id_text=id_text
+    )
+    
+    db.add(new_job)
+    db.commit()
+    db.refresh(new_job)
+
+    # Redirect home or to confirmation. For now home.
+    return RedirectResponse(url="/", status_code=303)
+
 @app.get("/upload_resume", include_in_schema=False)
 async def hello_page(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="upload_resume.html",
-        context={"company_name": "YAHA"}  # Pass data to the template here
+        context={"company_name": "ResMe"}  # Pass data to the template here
     )
 
 
@@ -38,7 +82,7 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
         return templates.TemplateResponse(
             request=request,
             name="upload_resume.html",
-            context={"company_name": "YAHA", "error": "Invalid file type. Only PDF and DOC/DOCX allowed."}
+            context={"company_name": "ResMe", "error": "Invalid file type. Only PDF and DOC/DOCX allowed."}
         )
 
     # Check size
@@ -50,7 +94,7 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
         return templates.TemplateResponse(
             request=request,
             name="upload_resume.html",
-            context={"company_name": "YAHA", "error": "File too large. Max size is 5MB."}
+            context={"company_name": "ResMe", "error": "File too large. Max size is 5MB."}
         )
 
     upload_dir = "uploads"
