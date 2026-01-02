@@ -19,17 +19,12 @@ jobs:
       - name: install-req
         run: pip install -r requirements.txt
       - name: run-tests
-        run: pytest -q --junitxml=tests/results/junit.xml --cov=src --cov-report=html:tests/results/coverage.html
+        run: pytest -v tests/ --cov ./ --cov-report html:./rport-tests --self-contained-html
       - name: upload-coverage-junit
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: tests/results/junit.xml
-      - name: upload-coverage-html
-        uses: actions/upload-artifact@v4
-        with:
-          name: junit-report
-          path: tests/results/coverage.html
+          path: ./rport-tests
       - name: run-lint
         run: pylint --rcfile .pylintrc --output-format=parseable:art_pylint.output.txt ./ || true
       - name: upload-lint-report
