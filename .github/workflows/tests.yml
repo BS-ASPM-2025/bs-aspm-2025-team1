@@ -1,4 +1,4 @@
-name: Countinues Deployment Pipeline
+name: Countinues Development Pipeline
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 jobs:
 
   job1:
-    name: runt unit tests
+    name: run unit tests
     runs-on: ubuntu-latest
     steps:
       - name: step-1
