@@ -33,6 +33,9 @@ pydantic_core==2.41.5
 Pygments==2.19.2
 pypdfium2==5.2.0
 pytest==9.0.2
+pytest-cov==7.0.0
+pytest-html==4.1.1
+pytest-metadata==3.1.1
 python-multipart==0.0.21
 PyYAML==6.0.3
 regex==2025.11.3
