@@ -23,8 +23,8 @@ jobs:
       - name: upload-coverage-junit
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: ./rport-tests
+          name: coverage-report-${{ github.run_number }}
+          path: ./rport-tests_${{ github.run_number }}
       - name: run-lint
         run: pylint --rcfile .pylintrc --output-format=parseable:art_pylint_${{ github.run_number }}.output.txt ./ || true
       - name: upload-lint-report
