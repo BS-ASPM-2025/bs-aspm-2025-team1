@@ -19,6 +19,13 @@ app = FastAPI(title="Resume–Job Matcher")
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     yield
+@app.get("/")
+async def root(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={"company_name": "ResMe"}
+    )
 
 @app.get("/post_job", include_in_schema=False)
 async def post_job_page(request: Request):
