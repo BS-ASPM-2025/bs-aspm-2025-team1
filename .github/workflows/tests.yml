@@ -19,16 +19,16 @@ jobs:
       - name: install-req
         run: pip install -r requirements.txt
       - name: run-tests
-        run: pytest -v tests/ --cov ./ --cov-report html:./rport-tests --self-contained-html
+        run: pytest -v tests/ --cov ./ --cov-report html:./rport-tests_${{ github.run_number }} --self-contained-html
       - name: upload-coverage-junit
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: ./rport-tests
       - name: run-lint
-        run: pylint --rcfile .pylintrc --output-format=parseable:art_pylint.output.txt ./ || true
+        run: pylint --rcfile .pylintrc --output-format=parseable:art_pylint_${{ github.run_number }}.output.txt ./ || true
       - name: upload-lint-report
         uses: actions/upload-artifact@v4
         with:
-          name: linter-report
-          path: art_pylint.output.txt
+          name: linter-report-${{ github.run_number }}
+          path: art_pylint_${{ github.run_number }}.output.txt
