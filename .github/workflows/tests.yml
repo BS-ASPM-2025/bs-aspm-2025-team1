@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - Feature1
+
+jobs:
+
+  job1:
+    name: first-job
+    runs-on: ubuntu-latest
+    steps:
+      - name: step-1
+        uses: actions/checkout@v4.0.0
+      - name: step-2
+        uses: "docker://python:3.14"
+      - name: step-3
+        run: ls -alr
+      - name: install-req
+        run: pip install -r requirements.txt
+      - name: run-tests
+        run: pytest -q --junitxml=tests/results/junit.xml --cov=src --cov-report=html:tests/results/coverage.html
+      - name: upload-coverage-junit
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: tests/results/junit.xml
+      - name: upload-coverage-html
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-report
+          path: tests/results/coverage.html
+      - name: run-lint
+        run: pylint --rcfile .pylintrc --output-format=parseable:art_pylint.output.txt ./ || true
+      - name: upload-lint-report
+        uses: actions/upload-artifact@v4
+        with:
+          name: linter-report
+          path: art_pylint.output.txt
