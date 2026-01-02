@@ -64,4 +64,4 @@ def test_upload_valid_pdf(client):
     # However, TestClient follows redirects by default. The final page is "/" (index.html)
     assert response.status_code == 200
     # Ideally we check that we landed on home page, e.g. check for company name
-    assert "YAHA" in response.text
+    assert "ResMe" in response.text
