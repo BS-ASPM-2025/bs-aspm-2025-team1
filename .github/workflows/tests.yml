@@ -7,7 +7,7 @@ on:
 jobs:
 
   job1:
-    name: first-job
+    name: runt unit tests
     runs-on: ubuntu-latest
     steps:
       - name: step-1
@@ -25,6 +25,11 @@ jobs:
         with:
           name: coverage-report-${{ github.run_number }}
           path: ./rport-tests_${{ github.run_number }}
+
+  job2:
+    name: linter
+    runs-on: ubuntu-latest
+    steps:
       - name: run-lint
         run: pylint --rcfile .pylintrc --output-format=parseable:art_pylint_${{ github.run_number }}.output.txt ./ || true
       - name: upload-lint-report
@@ -32,3 +37,4 @@ jobs:
         with:
           name: linter-report-${{ github.run_number }}
           path: art_pylint_${{ github.run_number }}.output.txt
+    
