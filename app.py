@@ -139,7 +139,19 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     db.add(resume_test)
     db.commit()
     db.refresh(resume_test)
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/resume_upload_feedback", status_code=303)
+
+@app.get("/resume_upload_feedback", include_in_schema=False)
+async def resume_upload_feedback_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="resume_upload_feedback.html",
+        context={"company_name": "ResMe"}
+    )
+
+#@app.post("/resume_upload_feedback", include_in_schema=False)
+#async def resume_upload_feedback_return(password: str = Form(...)):
+#    return RedirectResponse(url="/", status_code=303)
 
 @app.get("/passcode", include_in_schema=False)
 async def passcode_page(request: Request):
