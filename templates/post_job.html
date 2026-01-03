@@ -129,6 +129,16 @@
             flex: 1;
         }
 
+    .success-alert {
+        background-color: #dcfce7;
+        color: #166534;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid #bbf7d0;
+        margin: 1rem 0 1.5rem;
+        font-weight: 600;
+    }
+
         button[type="submit"] {
             background-color: var(--primary-color);
             color: white;
@@ -164,6 +174,10 @@
         <div class="form-card">
             <h1>Post a Job Opportunity</h1>
             <p class="subtitle">Fill in the details below to find the perfect candidate.</p>
+
+            {% if success %}
+              <div class="success-alert">✅ Job posted successfully!</div>
+            {% endif %}
 
             <form action="/post_job" method="post">
                 <div class="form-group">
@@ -208,5 +222,13 @@
     </main>
 
 </body>
+
+#makes success alert fade after 3 second
+<script>
+  setTimeout(() => {
+    const el = document.querySelector('.success-alert');
+    if (el) el.remove();
+  }, 3000);
+</script>
 
 </html>
