@@ -5,7 +5,7 @@ on:
     branches:
       - ci
   pull_request:
-    types: [opened]
+    types: [opened, synchronize]
   workflow_dispatch:
 jobs:
 
