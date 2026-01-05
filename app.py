@@ -37,10 +37,16 @@ async def root(request: Request):
 
 @app.get("/post_job", include_in_schema=False)
 async def post_job_page(request: Request):
+    print("POST_JOB GET URL:", str(request.url))
+    print("QUERY PARAMS:", dict(request.query_params))
+
+    success = request.query_params.get("success") == "1"
+    print("SUCCESS BOOL:", success)
+
     return templates.TemplateResponse(
         request=request,
         name="post_job.html",
-        context={"company_name": "ResMe"}
+        context={"company_name": "ResMe", "success": success}
     )
 
 
@@ -48,7 +54,7 @@ async def post_job_page(request: Request):
 async def post_job(
         request: Request,
         title: str = Form(...),
-        company: str = Form(...),
+        #company: str = Form(...),
         degree: str = Form(...),
         experience: str = Form(...),
         required_skills: str = Form(...),
@@ -56,14 +62,14 @@ async def post_job(
         db: Session = Depends(get_db)
 ):
     # Combine fields for match algorithm text
-    combined_text = f"Title: {title}\nCompany: {company}\nSkills: {required_skills}\nDegree: {degree}\nExperience: {experience}\n\nDescription:\n{job_text}"
+    combined_text = f"Title: {title}\nSkills: {required_skills}\nDegree: {degree}\nExperience: {experience}\n\nDescription:\n{job_text}"
 
     # Create simple ID (in real app use UUID)
     id_text = str(uuid.uuid4())
 
     new_job = Job(
         title=title,
-        company=company,
+        #company=company,
         degree=degree,
         experience=experience,
         required_skills=required_skills,
@@ -76,7 +82,7 @@ async def post_job(
     db.refresh(new_job)
 
     # Redirect home or to confirmation. For now home.
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/post_job?success=1", status_code=303)
 
 @app.get("/upload_resume", include_in_schema=False)
 async def hello_page(request: Request):
@@ -133,7 +139,19 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     db.add(resume_test)
     db.commit()
     db.refresh(resume_test)
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url="/resume_upload_feedback", status_code=303)
+
+@app.get("/resume_upload_feedback", include_in_schema=False)
+async def resume_upload_feedback_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="resume_upload_feedback.html",
+        context={"company_name": "ResMe"}
+    )
+
+#@app.post("/resume_upload_feedback", include_in_schema=False)
+#async def resume_upload_feedback_return(password: str = Form(...)):
+#    return RedirectResponse(url="/", status_code=303)
 
 @app.get("/passcode", include_in_schema=False)
 async def passcode_page(request: Request):
