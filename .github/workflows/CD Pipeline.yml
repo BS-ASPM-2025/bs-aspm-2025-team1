@@ -3,7 +3,7 @@ name: Countinues Development Pipeline
 on:
   push:
     branches:
-      - dev
+      - ci
   pull_request:
     types: [opened]
   workflow_dispatch:
