@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 jobs:
 
-  job1:
+  test:
     name: run unit tests
     runs-on: ubuntu-latest
     steps:
@@ -29,7 +29,7 @@ jobs:
           name: coverage-report-${{ github.run_number }}
           path: ./rport-tests_${{ github.run_number }}
 
-  job2:
+  lint:
     name: linter
     runs-on: ubuntu-latest
     steps:
@@ -42,9 +42,9 @@ jobs:
           name: linter-report-${{ github.run_number }}
           path: art_pylint_${{ github.run_number }}.output.txt
 
-  job3:
+  build:
     name: build docker image
-    needs: [job1, job2]
+    needs: [test, lint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,4 +57,69 @@ jobs:
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }} .
       - name: push-image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }}
-    
+  
+  deploy:
+    name: deploy-to-azure
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: trigger-azure-pipeline
+        run: |
+          echo "Triggering Azure pipeline..."
+          
+          # Trigger the pipeline and capture the response
+          response=$(curl -s -u :${{ secrets.AZURE_DEVOPS_TOKEN }} -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
+              "resources": {
+                "repositories": {
+                  "self": {
+                    "refName": "refs/heads/dev"
+                  }
+                }
+              },
+              "templateParameters": {
+                "imageTag": "${{ github.actor }}-${{ github.run_number }}"
+              }
+            }' \
+            "https://dev.azure.com/${{ secrets.AZURE_ORG }}/${{ secrets.AZURE_PROJECT }}/_apis/pipelines/${{ secrets.AZURE_PIPELINE_ID }}/runs?api-version=6.0-preview.1")
+
+          # Extract Run ID using grep/sed (avoiding jq dependency if not certain it's available, though usually is on ubuntu-latest)
+          # Assuming standard Azure DevOps JSON response structure
+          run_id=$(echo "$response" | jq -r '.id')
+          
+          if [ -z "$run_id" ] || [ "$run_id" == "null" ]; then
+            echo "Failed to trigger pipeline. Response:"
+            echo "$response"
+            exit 1
+          fi
+
+          echo "Azure Pipeline Run ID: $run_id"
+          echo "Pipeline URL: https://dev.azure.com/${{ secrets.AZURE_ORG }}/${{ secrets.AZURE_PROJECT }}/_build/results?buildId=$run_id"
+          
+          # Poll for status
+          echo "Waiting for pipeline to complete..."
+          status="inProgress"
+          result=""
+          
+          while [ "$status" == "inProgress" ] || [ "$status" == "notStarted" ]; do
+            sleep 10
+            run_status_response=$(curl -s -u :${{ secrets.AZURE_DEVOPS_TOKEN }} \
+              "https://dev.azure.com/${{ secrets.AZURE_ORG }}/${{ secrets.AZURE_PROJECT }}/_apis/pipelines/${{ secrets.AZURE_PIPELINE_ID }}/runs/$run_id?api-version=6.0-preview.1")
+            
+            status=$(echo "$run_status_response" | jq -r '.state')
+            result=$(echo "$run_status_response" | jq -r '.result')
+            
+            echo "Current status: $status"
+          done
+
+          echo "Pipeline finished with status: $status and result: $result"
+
+          if [ "$result" == "succeeded" ]; then
+            echo "Deployment succeeded!"
+            exit 0
+          else
+            echo "Deployment failed!"
+            exit 1
+          fi
