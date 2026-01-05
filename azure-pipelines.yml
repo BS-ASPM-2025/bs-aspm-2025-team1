@@ -8,7 +8,7 @@ parameters:
   default: 'team1-AymanElsayeed-22'
 
 variables:
-  azureServiceConnectionId: '33503aa0-a2f9-44d4-8b26-1c6823745ccb'
+  azureServiceConnectionId: '1a9fd121-57a1-4599-9a24-d2d1b348b8a1'
   webAppName: 'projectmanagement'
   vmImageName: 'ubuntu-latest'
   environmentName: 'projectmanagement'
