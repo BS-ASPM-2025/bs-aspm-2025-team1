@@ -75,7 +75,7 @@ jobs:
               "resources": {
                 "repositories": {
                   "self": {
-                    "refName": "refs/heads/dev"
+                    "refName": "refs/heads/ci"
                   }
                 }
               },
