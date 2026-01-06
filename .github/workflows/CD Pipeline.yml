@@ -100,7 +100,7 @@ jobs:
                 }
               },
               "templateParameters": {
-                "imageTag": "${{ github.actor }}-${{ github.run_number }}"
+                "imageTag": "team1-${{ github.actor }}-${{ github.run_number }}"
               }
             }' \
             "https://dev.azure.com/${{ secrets.AZURE_ORG }}/${{ secrets.AZURE_PROJECT }}/_apis/pipelines/${{ secrets.AZURE_PIPELINE_ID }}/runs?api-version=6.0-preview.1")
