@@ -3,7 +3,7 @@ name: Countinues Development Pipeline
 on:
   push:
     branches:
-      - ci
+      - '**'
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
@@ -81,6 +81,7 @@ jobs:
     name: deploy-to-azure
     needs: build
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.base_ref == 'dev'
     steps:
       - uses: actions/checkout@v4
       - name: trigger-azure-pipeline
@@ -94,7 +95,7 @@ jobs:
               "resources": {
                 "repositories": {
                   "self": {
-                    "refName": "refs/heads/ci"
+                    "refName": "refs/heads/dev"
                   }
                 }
               },
