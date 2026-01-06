@@ -3,7 +3,7 @@ name: Countinues Development Pipeline
 on:
   push:
     branches:
-      - dev
+      - ci
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
@@ -79,7 +79,7 @@ jobs:
               "resources": {
                 "repositories": {
                   "self": {
-                    "refName": "refs/heads/dev"
+                    "refName": "refs/heads/ci"
                   }
                 }
               },
