@@ -6,7 +6,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_302_FOUND
-from fastapi import HTTPException
+
 from shared import get_db, engine, Base
 from models import Resume, Job
 import uuid
