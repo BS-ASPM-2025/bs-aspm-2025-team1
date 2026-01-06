@@ -6,7 +6,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_302_FOUND
-
+from fastapi import HTTPException
 from shared import get_db, engine, Base
 from models import Resume, Job
 import uuid
@@ -28,11 +28,12 @@ async def lifespan(app: FastAPI):
     yield
 @app.get("/")
 async def root(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={"company_name": "ResMe"}
-    )
+    raise HTTPException(status_code=500, detail="Simulated Crash")
+    # return templates.TemplateResponse(
+    #     request=request,
+    #     name="index.html",
+    #     context={"company_name": "ResMe"}
+    # )
 
 
 @app.get("/post_job", include_in_schema=False)
