@@ -31,7 +31,7 @@ jobs:
       - name: upload-to-github-pages
         uses: actions/upload-pages-artifact@v4
         with:
-          path: ./rport-tests_${{ github.run_number }}
+          path: ./docs/rport-tests_${{ github.run_number }}
 
   lint:
     name: linter
