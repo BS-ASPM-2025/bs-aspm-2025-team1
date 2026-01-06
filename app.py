@@ -28,12 +28,11 @@ async def lifespan(app: FastAPI):
     yield
 @app.get("/")
 async def root(request: Request):
-    raise HTTPException(status_code=500, detail="Simulated Crash")
-    # return templates.TemplateResponse(
-    #     request=request,
-    #     name="index.html",
-    #     context={"company_name": "ResMe"}
-    # )
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={"company_name": "ResMe"}
+    )
 
 
 @app.get("/post_job", include_in_schema=False)
