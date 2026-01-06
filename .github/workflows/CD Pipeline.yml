@@ -35,6 +35,7 @@ jobs:
 
   deploy-pages:
     needs: test
+    if: github.event_name == 'pull_request'
     permissions:
       pages: write
       id-token: write
