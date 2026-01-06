@@ -95,7 +95,7 @@ jobs:
               "resources": {
                 "repositories": {
                   "self": {
-                    "refName": "refs/heads/*"
+                    "refName": "refs/heads/${{ github.head_ref }}"
                   }
                 }
               },
