@@ -219,3 +219,4 @@ async def passcode_submit(password: str = Form(...)):
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run("app:app", port=8000,host='0.0.0.0', reload=False, workers=4)
+    
