@@ -30,7 +30,6 @@ async def lifespan(app: FastAPI):
 
 @app.get("/")
 async def root(request: Request):
-
     return templates.TemplateResponse(
         request=request,
         name="index.html",
