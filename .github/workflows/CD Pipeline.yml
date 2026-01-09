@@ -77,7 +77,7 @@ jobs:
       - name: push-image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }}
   
-    deploy:
+  deploy:
     name: deploy-to-azure
     needs: build
     runs-on: ubuntu-latest
