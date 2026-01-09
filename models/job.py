@@ -18,9 +18,9 @@ class Job(Base):
     experience = Column(Text, nullable=True) # Storing as string for flexibility (e.g. "5+ years")
 
     # Weights
-    weight_skills = Column(Float, default=1.0)
-    weight_degree = Column(Float, default=1.0)
-    weight_experience = Column(Float, default=1.0)
+    skills_weight = Column(Float, default=1.0)
+    degree_weight = Column(Float, default=1.0)
+    experience_weight = Column(Float, default=1.0)
     weight_general = Column(Float, default=1.0)
 
     created_at = Column(DateTime, default=datetime.utcnow)
