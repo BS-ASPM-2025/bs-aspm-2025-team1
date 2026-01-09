@@ -90,7 +90,7 @@ async def post_job_feedback_page(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="post_job_feedback.html",
-        context={"company_name": "ResuMe"}
+        context={"company_name": "ResuMe"})
 
 @app.get("/upload_resume", include_in_schema=False)
 async def hello_page(request: Request):
