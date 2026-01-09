@@ -1,6 +1,5 @@
 # Azure pipeline to deploy Docker image from Docker Hub to Azure Web App
 trigger: none  # Triggered via REST API from GitHub Actions
-pr: none      # Disable automatic PR triggers
 
 parameters:
 - name: imageTag
