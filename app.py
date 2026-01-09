@@ -173,6 +173,8 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
         score = calculate_match_score(resume_test.resume_text, job)
         results.append({
             "job_id": job.id,
+            "job_title": job.title,
+            "company": job.company,
             "score": score
         })
     # Sort results by score in descending order
