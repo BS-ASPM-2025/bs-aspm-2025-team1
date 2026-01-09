@@ -19,4 +19,4 @@ def test_post_job_success(client):
     # Expect redirect to home page, which returns 200 OK (TestClient follows redirects)
     assert response.status_code == 200
     # Check if we landed on the home page (look for "ResMe" which user updated)
-    assert "ResMe" in response.text
+    assert "success" in response.text
