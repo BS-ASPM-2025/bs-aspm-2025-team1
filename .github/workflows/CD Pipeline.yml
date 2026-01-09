@@ -3,13 +3,13 @@ name: Countinues Development Pipeline
 on:
   push:
     branches:
-      - dev
+      - '**'
   pull_request:
-    types: [opened]
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 jobs:
 
-  job1:
+  test:
     name: run unit tests
     runs-on: ubuntu-latest
     steps:
@@ -28,8 +28,27 @@ jobs:
         with:
           name: coverage-report-${{ github.run_number }}
           path: ./rport-tests_${{ github.run_number }}
+      - name: upload-to-github-pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./rport-tests_${{ github.run_number }}
 
-  job2:
+  deploy-pages:
+    needs: test
+    if: github.event_name == 'pull_request'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  lint:
     name: linter
     runs-on: ubuntu-latest
     steps:
@@ -42,9 +61,9 @@ jobs:
           name: linter-report-${{ github.run_number }}
           path: art_pylint_${{ github.run_number }}.output.txt
 
-  job3:
+  build:
     name: build docker image
-    needs: [job1, job2]
+    needs: [test, lint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,4 +76,21 @@ jobs:
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }} .
       - name: push-image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }}
-    
+  
+  deploy:
+    name: deploy-to-azure
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.base_ref == 'dev'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'projectmanagement'
+          images: '${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }}'
