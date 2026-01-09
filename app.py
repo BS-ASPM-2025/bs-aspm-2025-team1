@@ -12,6 +12,7 @@ from models import Resume, Job
 import uuid
 
 from src.handlepdf import extract_text_from_pdf
+from src.findMatch import calculate_match_score
 
 templates = Jinja2Templates(directory="templates")
 
@@ -81,8 +82,26 @@ async def post_job(
     db.commit()
     db.refresh(new_job)
 
+    results = []
+    # loop over resumes in DB and calculate the match score (placeholder logic)
+    resumes = db.query(Resume).all()
+    for resume in resumes:
+        score = calculate_match_score(resume.resume_text, new_job)
+        results.append({
+            "resume_id": resume.id,
+            "score": score
+        })
+
+    # Sort results by score in descending order
+    results.sort(key=lambda x: x['score'], reverse=True)
+
     # Redirect home or to confirmation. For now home.
-    return RedirectResponse(url="/post_job_feedback", status_code=303)
+    # return RedirectResponse(url="/post_job_feedback", status_code=303)
+    return templates.TemplateResponse(
+        request=request,
+        name="post_job_feedback.html",
+        context={"company_name": "ResuMe", "matches": results})
+
 
 
 @app.get("/post_job_feedback", include_in_schema=False)

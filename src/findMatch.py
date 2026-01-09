@@ -51,9 +51,9 @@ def calculate_match_score(resume_text: str, job: Job) -> float:
 
     # Weighted Average
     total_weight = (
-        job.weight_skills + 
-        job.weight_degree + 
-        job.weight_experience + 
+        job.skills_weight + 
+        job.degree_weight + 
+        job.experience_weight + 
         job.weight_general
     )
     
@@ -61,9 +61,9 @@ def calculate_match_score(resume_text: str, job: Job) -> float:
         return 0.0
         
     final_score = (
-        (scores.get('skills', 0) * job.weight_skills) +
-        (scores.get('degree', 0) * job.weight_degree) +
-        (scores.get('experience', 0) * job.weight_experience) +
+        (scores.get('skills', 0) * job.skills_weight) +
+        (scores.get('degree', 0) * job.degree_weight) +
+        (scores.get('experience', 0) * job.experience_weight) +
         (scores.get('general', 0) * job.weight_general)
     ) / total_weight
 
