@@ -196,19 +196,54 @@
                             <option value="None">No Degree Required</option>
                         </select>
                     </div>
+                    <div>
+                        <label>Weight</label>
+                        <select name="degree_weight">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3" selected>3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                </div>
 
+                 <div class="row">
                     <div class="form-group">
                         <label for="experience">Years of Experience</label>
                         <input type="number" id="experience" name="experience" min="0" max="50" placeholder="e.g. 3"
                             required>
                     </div>
+                     <div>
+                        <label>Weight</label>
+                        <select name="experience_weight">
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3" selected>3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="skills">Required Skills (comma separated)</label>
-                    <input type="text" id="skills" name="required_skills" placeholder="e.g. Python, FastAPI, React, SQL"
-                        required>
+                <div class="row">
+                    <div class="form-group">
+                        <label for="skills">Required Skills (comma separated)</label>
+                        <input type="text" id="skills" name="required_skills" placeholder="e.g. Python, FastAPI, React, SQL"
+                            required>
+                    </div>
+                    <div>
+                        <label>Weight</label>
+                        <select name="skills_weight">
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3" selected>3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                        </select>
+                    </div>
                 </div>
+
 
                 <div class="form-group">
                     <label for="job_text">Job Description</label>
