@@ -82,7 +82,15 @@ async def post_job(
     db.refresh(new_job)
 
     # Redirect home or to confirmation. For now home.
-    return RedirectResponse(url="/post_job?success=1", status_code=303)
+    return RedirectResponse(url="/post_job_feedback", status_code=303)
+
+
+@app.get("/post_job_feedback", include_in_schema=False)
+async def post_job_feedback_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="post_job_feedback.html",
+        context={"company_name": "ResuMe"})
 
 @app.get("/upload_resume", include_in_schema=False)
 async def hello_page(request: Request):
