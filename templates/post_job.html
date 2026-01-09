@@ -175,7 +175,11 @@
             <h1>Post a Job Opportunity</h1>
             <p class="subtitle">Fill in the details below to find the perfect candidate.</p>
 
-            <form action="/post_job" method="post">
+            {% if success %}
+              <div class="success-alert">✅ Job posted successfully!</div>
+            {% endif %}
+
+            <form id="postJobForm" action="/post_job" method="post">
                 <div class="form-group">
                     <label for="title">Job Title</label>
                     <input type="text" id="title" name="title" placeholder="e.g. Senior Software Engineer" required>
@@ -194,31 +198,19 @@
                     </div>
                     <div>
                         <label>Weight</label>
-                        <select name="degree_weight">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
+                        <input type="number" class="weight-input" name="degree_weight" min="0" max="50" value="40">
                     </div>
                 </div>
 
                  <div class="row">
                     <div class="form-group">
                         <label for="experience">Years of Experience</label>
-                        <input type="number" id="experience" name="experience" min="0" max="50" placeholder="e.g. 3"
+                        <input type="number" id="experience" name="experience" min="0" max="60" placeholder="e.g. 3"
                             required>
                     </div>
                      <div>
                         <label>Weight</label>
-                        <select name="experience_weight">
-                          <option value="1">1</option>
-                          <option value="2">2</option>
-                          <option value="3" selected>3</option>
-                          <option value="4">4</option>
-                          <option value="5">5</option>
-                        </select>
+                        <input type="number" class="weight-input" name="experience_weight" min="0" max="60" value="30">
                     </div>
                 </div>
 
@@ -229,14 +221,8 @@
                             required>
                     </div>
                     <div>
-                        <label>Weight</label>
-                        <select name="skills_weight">
-                          <option value="1">1</option>
-                          <option value="2">2</option>
-                          <option value="3" selected>3</option>
-                          <option value="4">4</option>
-                          <option value="5">5</option>
-                        </select>
+                       <label>Weight</label>
+                       <input type="number" class="weight-input" name="skills_weight" min="0" max="50" value="30">
                     </div>
                 </div>
 
@@ -247,19 +233,102 @@
                         placeholder="Detailed description of the role and responsibilities..." required></textarea>
                 </div>
 
-                <button type="submit">Post Job</button>
+                <p id="weightsInfo" style="margin-top:0.5rem; font-weight:600;"></p>
+                <button id="submitBtn" type="submit">Post Job</button>
             </form>
         </div>
     </main>
 
 </body>
+    <main>
 
-#makes success alert fade after 3 second
-<script>
-  setTimeout(() => {
-    const el = document.querySelector('.success-alert');
-    if (el) el.remove();
-  }, 3000);
-</script>
+        <script>
+          // Fade success alert after 3 seconds
+          setTimeout(() => {
+            const el = document.querySelector('.success-alert');
+            if (el) el.remove();
+          }, 3000);
+
+          // ===== Weights: must sum exactly to 100 =====
+          const REQUIRED_SUM = 100;
+          const DECIMALS = 1; // 1 => one digit after decimal. set to 0 for integers only.
+
+          const form = document.getElementById('postJobForm');
+          const inputs = document.querySelectorAll('.weight-input');
+          const info = document.getElementById('weightsInfo');
+          const submitBtn = document.getElementById('submitBtn');
+
+          const roundTo = (n, decimals) => {
+            const p = Math.pow(10, decimals);
+            return Math.round(n * p) / p;
+          };
+
+          const formatTo = (n, decimals) => {
+            return roundTo(n, decimals).toFixed(decimals);
+          };
+
+          const parse = (v) => {
+            const x = parseFloat(v);
+            return Number.isFinite(x) ? x : 0;
+          };
+
+          const updateWeightsUI = () => {
+            let sum = 0;
+            inputs.forEach(i => sum += parse(i.value));
+            sum = roundTo(sum, DECIMALS);
+
+            const ok = (sum === REQUIRED_SUM);
+
+            if (info) {
+              info.textContent = ok
+                ? `✓ Weights total = ${formatTo(sum, DECIMALS)} / ${REQUIRED_SUM}`
+                : `Weights total: ${formatTo(sum, DECIMALS)} / ${REQUIRED_SUM} (must equal ${REQUIRED_SUM})`;
+              info.style.color = ok ? '#166534' : '#b91c1c';
+            }
+
+            if (submitBtn) submitBtn.disabled = !ok;
+          };
+
+          // Keep values within allowed min/max + snap to 1 decimal on blur
+          inputs.forEach(input => {
+            input.addEventListener('input', () => {
+              // enforce min/max live (optional but nice)
+              const min = input.min !== '' ? parseFloat(input.min) : -Infinity;
+              const max = input.max !== '' ? parseFloat(input.max) : Infinity;
+              let v = parse(input.value);
+
+              if (v < min) v = min;
+              if (v > max) v = max;
+
+              input.value = v; // keep raw while typing
+              updateWeightsUI();
+            });
+
+            input.addEventListener('blur', () => {
+              // snap to DECIMALS digits on blur
+              const v = parse(input.value);
+              input.value = formatTo(v, DECIMALS);
+              updateWeightsUI();
+            });
+          });
+
+          // Final guard: prevent submit if not exactly 100 (even if someone bypasses disabled button)
+          if (form) {
+            form.addEventListener('submit', (e) => {
+              let sum = 0;
+              inputs.forEach(i => sum += parse(i.value));
+              sum = roundTo(sum, DECIMALS);
+
+              if (sum !== REQUIRED_SUM) {
+                e.preventDefault();
+                updateWeightsUI();
+                alert(`Weights must sum exactly to ${REQUIRED_SUM}. Current total: ${formatTo(sum, DECIMALS)}.`);
+              }
+            });
+          }
+
+          // Initialize on load
+          updateWeightsUI();
+        </script>
 
 </html>
