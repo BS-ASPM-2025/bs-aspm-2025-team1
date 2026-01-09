@@ -1,0 +1,10 @@
+DELETE http://localhost:8000/delete/job/1234
+User-Agent: IntelliJ HTTP Client/PyCharm 2025.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+content-length: 0
+
+<> 2025-12-26T183013.200.json
+
+###
+

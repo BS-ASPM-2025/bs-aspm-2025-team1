@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f383dad3-5378-4108-81cf-9c95250a286a" name="Changes" comment="test." />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="71" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+        <option value="UML Component" />
+        <option value="Work Breakdown Structure" />
+        <option value="UML Deployment" />
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="dev" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HttpClientOnboardingState">{
+  &quot;isOnboardingCommentShown&quot;: true
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="36yLGhiavO3EVxnwFJtNTpFMgqz" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "DefaultPlantUmlFileTemplate": "UML Deployment",
+    "HTTP Request.All in generated-requests.executor": "Run",
+    "Python tests.Python tests for tests.test_api.test_add_job.executor": "Run",
+    "Python tests.Python tests for tests.test_api.test_create_user.executor": "Run",
+    "Python tests.Python tests for tests.test_api.test_read_root.executor": "Run",
+    "Python tests.Python tests for tests.test_api_upload.test_upload_file_too_large.executor": "Run",
+    "Python tests.Python tests for tests.test_api_upload.test_upload_invalid_file_type.executor": "Run",
+    "Python tests.Python tests for tests.test_api_upload.test_upload_valid_pdf.executor": "Run",
+    "Python tests.Python tests for tests.test_post_job.test_post_job_success.executor": "Run",
+    "Python.app.executor": "Run",
+    "Python.init_db.executor": "Run",
+    "Python.scratch_59.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "BSASPM25T1-15",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/Users/aymanelsayeed/PycharmProjects/bs-aspm-2025-team1",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "sqlite"
+    ],
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "Python"
+    ]
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/.github/workflows" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/shared" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.scratch_59">
+    <configuration name="scratch_59" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="bs-aspm-2025-team1" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$APPLICATION_CONFIG_DIR$/scratches/scratch_59.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for tests.test_api_upload.test_upload_file_too_large" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="bs-aspm-2025-team1" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.test_api_upload.test_upload_file_too_large&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for tests.test_api_upload.test_upload_invalid_file_type" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="bs-aspm-2025-team1" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.test_api_upload.test_upload_invalid_file_type&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for tests.test_api_upload.test_upload_valid_pdf" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="bs-aspm-2025-team1" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.test_api_upload.test_upload_valid_pdf&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for tests.test_post_job.test_post_job_success" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="bs-aspm-2025-team1" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.test_post_job.test_post_job_success&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.scratch_59" />
+        <item itemvalue="Python tests.Python tests for tests.test_post_job.test_post_job_success" />
+        <item itemvalue="Python tests.Python tests for tests.test_api_upload.test_upload_valid_pdf" />
+        <item itemvalue="Python tests.Python tests for tests.test_api_upload.test_upload_invalid_file_type" />
+        <item itemvalue="Python tests.Python tests for tests.test_api_upload.test_upload_file_too_large" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-c7e53b3be11b-JavaScript-PY-253.28294.336" />
+        <option value="bundled-python-sdk-0978a7220b69-9867c7d4c0a4-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.28294.336" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f383dad3-5378-4108-81cf-9c95250a286a" name="Changes" comment="" />
+      <created>1765973777751</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1765973777751</updated>
+      <workItem from="1765973779212" duration="6481000" />
+      <workItem from="1766134770457" duration="333000" />
+      <workItem from="1766144597958" duration="22000" />
+      <workItem from="1766753335979" duration="56234000" />
+      <workItem from="1767437556423" duration="6749000" />
+      <workItem from="1767597486966" duration="3121000" />
+      <workItem from="1767688855026" duration="14517000" />
+    </task>
+    <task id="LOCAL-00001" summary="init commit.">
+      <option name="closed" value="true" />
+      <created>1765974026072</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1765974026072</updated>
+    </task>
+    <task id="LOCAL-00002" summary="test.">
+      <option name="closed" value="true" />
+      <created>1765974062569</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1765974062569</updated>
+    </task>
+    <task id="LOCAL-00003" summary="init commit.">
+      <option name="closed" value="true" />
+      <created>1767180954863</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1767180954863</updated>
+    </task>
+    <task id="LOCAL-00004" summary="undo">
+      <option name="closed" value="true" />
+      <created>1767181055505</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1767181055505</updated>
+    </task>
+    <task id="LOCAL-00005" summary="init commit.">
+      <option name="closed" value="true" />
+      <created>1767181181692</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1767181181692</updated>
+    </task>
+    <task id="LOCAL-00006" summary="update.">
+      <option name="closed" value="true" />
+      <created>1767183926426</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1767183926426</updated>
+    </task>
+    <task id="LOCAL-00007" summary="init commit.">
+      <option name="closed" value="true" />
+      <created>1767187376968</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1767187376968</updated>
+    </task>
+    <task id="LOCAL-00008" summary="init commit.">
+      <option name="closed" value="true" />
+      <created>1767198016439</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1767198016439</updated>
+    </task>
+    <task id="LOCAL-00009" summary="add missing pkgs.">
+      <option name="closed" value="true" />
+      <created>1767347434059</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1767347434059</updated>
+    </task>
+    <task id="LOCAL-00010" summary="test fix.">
+      <option name="closed" value="true" />
+      <created>1767348181314</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1767348181314</updated>
+    </task>
+    <task id="LOCAL-00011" summary="init commit.">
+      <option name="closed" value="true" />
+      <created>1767348212976</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1767348212976</updated>
+    </task>
+    <task id="LOCAL-00012" summary="init commit.">
+      <option name="closed" value="true" />
+      <created>1767348730266</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1767348730266</updated>
+    </task>
+    <task id="LOCAL-00013" summary="add missing files.">
+      <option name="closed" value="true" />
+      <created>1767349166427</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1767349166427</updated>
+    </task>
+    <task id="LOCAL-00014" summary="bug fix.">
+      <option name="closed" value="true" />
+      <created>1767349465487</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1767349465487</updated>
+    </task>
+    <task id="LOCAL-00015" summary="bug fix.">
+      <option name="closed" value="true" />
+      <created>1767349707757</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1767349707757</updated>
+    </task>
+    <task id="LOCAL-00016" summary="init commit.">
+      <option name="closed" value="true" />
+      <created>1767351531901</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1767351531901</updated>
+    </task>
+    <task id="LOCAL-00017" summary="fix typo.">
+      <option name="closed" value="true" />
+      <created>1767351989337</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1767351989337</updated>
+    </task>
+    <task id="LOCAL-00018" summary="temp">
+      <option name="closed" value="true" />
+      <created>1767444596384</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1767444596384</updated>
+    </task>
+    <task id="LOCAL-00019" summary="temp">
+      <option name="closed" value="true" />
+      <created>1767597665337</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1767597665337</updated>
+    </task>
+    <task id="LOCAL-00020" summary="add empty file">
+      <option name="closed" value="true" />
+      <created>1767697374746</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1767697374746</updated>
+    </task>
+    <task id="LOCAL-00021" summary="rm empty file">
+      <option name="closed" value="true" />
+      <created>1767698255958</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1767698255958</updated>
+    </task>
+    <task id="LOCAL-00022" summary="test.">
+      <option name="closed" value="true" />
+      <created>1767722047017</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1767722047017</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/BSASPM25T1-7" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/BSASPM25T1-7" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="undo" />
+    <MESSAGE value="update." />
+    <MESSAGE value="add missing pkgs." />
+    <MESSAGE value="test fix." />
+    <MESSAGE value="add missing files." />
+    <MESSAGE value="bug fix." />
+    <MESSAGE value="init commit." />
+    <MESSAGE value="fix typo." />
+    <MESSAGE value="temp" />
+    <MESSAGE value="add empty file" />
+    <MESSAGE value="rm empty file" />
+    <MESSAGE value="test." />
+    <option name="LAST_COMMIT_MESSAGE" value="test." />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/bs_aspm_2025_team1$.coverage" NAME=" Coverage Results" MODIFIED="1767349666573" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/bs_aspm_2025_team1$init_db.coverage" NAME="init_db Coverage Results" MODIFIED="1766762633099" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src" />
+    <SUITE FILE_PATH="coverage/bs_aspm_2025_team1$app.coverage" NAME="app Coverage Results" MODIFIED="1767447297441" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/bs_aspm_2025_team1$scratch_59.coverage" NAME="scratch_59 Coverage Results" MODIFIED="1767691431368" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>
