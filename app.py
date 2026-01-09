@@ -166,7 +166,22 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     db.add(resume_test)
     db.commit()
     db.refresh(resume_test)
-    return RedirectResponse(url="/resume_upload_feedback", status_code=303)
+    # loop over jobs in DB and calculate the match score (placeholder logic)
+    results = []
+    jobs = db.query(Job).all()
+    for job in jobs:
+        score = calculate_match_score(resume_test.resume_text, job)
+        results.append({
+            "job_id": job.id,
+            "score": score
+        })
+    # Sort results by score in descending order
+    results.sort(key=lambda x: x['score'], reverse=True)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="resume_upload_feedback.html",
+        context={"company_name": "ResMe", "matches": results})
 
 @app.get("/resume_upload_feedback", include_in_schema=False)
 async def resume_upload_feedback_page(request: Request):
