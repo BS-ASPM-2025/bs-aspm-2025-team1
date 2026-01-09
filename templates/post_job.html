@@ -175,10 +175,6 @@
             <h1>Post a Job Opportunity</h1>
             <p class="subtitle">Fill in the details below to find the perfect candidate.</p>
 
-            {% if success %}
-              <div class="success-alert">✅ Job posted successfully!</div>
-            {% endif %}
-
             <form action="/post_job" method="post">
                 <div class="form-group">
                     <label for="title">Job Title</label>
