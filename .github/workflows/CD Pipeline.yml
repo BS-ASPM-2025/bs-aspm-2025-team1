@@ -92,5 +92,5 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'final-python'
+          app-name: 'projectmanagement'
           images: '${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }}'
