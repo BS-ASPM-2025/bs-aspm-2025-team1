@@ -1,16 +1,21 @@
 import os
 import shutil
+
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request, Depends, Form, File, UploadFile
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+from starlette.middleware.sessions import SessionMiddleware
 from starlette.status import HTTP_302_FOUND
 
 from shared import get_db, engine, Base
 from models import Resume, Job
 import uuid
 
+from src.handlepdf import extract_text_from_pdf
+from src.passcode_check import check_passcode
 from src.handlepdf import extract_text_from_pdf
 
 templates = Jinja2Templates(directory="templates")
@@ -21,6 +26,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(title="Resume–Job Matcher", lifespan=lifespan)
+app.add_middleware(SessionMiddleware, secret_key="dev-secret-change-me")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -43,46 +49,50 @@ async def post_job_page(request: Request):
     success = request.query_params.get("success") == "1"
     print("SUCCESS BOOL:", success)
 
+    company = request.session.get("company_name")
+    if not company:
+        return RedirectResponse(url="/passcode", status_code=303)
+
     return templates.TemplateResponse(
         request=request,
         name="post_job.html",
-        context={"company_name": "ResMe", "success": success}
+        context={"company_name": "ResMe", "company": company, "success": success}
     )
 
-
-@app.post("/post_job")
+@app.post("/post_job", include_in_schema=False)
 async def post_job(
         request: Request,
         title: str = Form(...),
-        #company: str = Form(...),
         degree: str = Form(...),
         experience: str = Form(...),
         required_skills: str = Form(...),
         job_text: str = Form(...),
         db: Session = Depends(get_db)
 ):
-    # Combine fields for match algorithm text
-    combined_text = f"Title: {title}\nSkills: {required_skills}\nDegree: {degree}\nExperience: {experience}\n\nDescription:\n{job_text}"
+    #validate passcode check
+    company = request.session.get("company_name")
+    if not company:
+        return RedirectResponse(url="/passcode", status_code=303)
 
-    # Create simple ID (in real app use UUID)
+    # Combine fields for match algorithm text
+    combined_text = (
+        f"Title: {title}\n"
+        f"Skills: {required_skills}\n"
+        f"Degree: {degree}\n"
+        f"Experience: {experience}\n\n"
+        f"Description:\n{job_text}"
+    )
+
     id_text = str(uuid.uuid4())
 
     new_job = Job(
         title=title,
-        #company=company,
         degree=degree,
         experience=experience,
         required_skills=required_skills,
-        job_text=combined_text,  # Using combined text for searching logic compatibility
+        job_text=combined_text,
         id_text=id_text
     )
-
-    db.add(new_job)
-    db.commit()
-    db.refresh(new_job)
-
-    # Redirect home or to confirmation. For now home.
-    return RedirectResponse(url="/post_job_feedback", status_code=303)
 
 
 @app.get("/post_job_feedback", include_in_schema=False)
@@ -161,6 +171,11 @@ async def resume_upload_feedback_page(request: Request):
 #async def resume_upload_feedback_return(password: str = Form(...)):
 #    return RedirectResponse(url="/", status_code=303)
 
+from fastapi import Request, Form
+from fastapi.responses import RedirectResponse
+
+from src.passcode_check import check_passcode
+
 @app.get("/passcode", include_in_schema=False)
 async def passcode_page(request: Request):
     return templates.TemplateResponse(
@@ -170,8 +185,22 @@ async def passcode_page(request: Request):
     )
 
 @app.post("/passcode", include_in_schema=False)
-async def passcode_submit(password: str = Form(...)):
+async def passcode_submit(request: Request, password: str = Form(...)):
+    password = password.strip()
+
+    valid, company = check_passcode(password)
+
+    if not valid:
+        return templates.TemplateResponse(
+            request=request,
+            name="passcode.html",
+            context={"company_name": "ResMe", "error": "Invalid password. Please try again."}
+        )
+
+    request.session["company_name"] = company
+
     return RedirectResponse(url="/post_job", status_code=303)
+
 
     # Validation
     ALLOWED_TYPES = ["application/pdf", "application/msword",
@@ -189,7 +218,7 @@ async def passcode_submit(password: str = Form(...)):
     file.file.seek(0, 2)
     size = file.file.tell()
     file.file.seek(0)
-    
+
     if size > MAX_SIZE:
         return templates.TemplateResponse(
             request=request,
