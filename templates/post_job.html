@@ -172,10 +172,12 @@
 
     <main>
         <div class="form-card">
-            <h1>Post a Job Opportunity</h1>
+            <h1><b>{{ company }}</b></h1>
+            <h2>Post a Job Opportunity</h2>
             <p class="subtitle">Fill in the details below to find the perfect candidate.</p>
 
             <form action="/post_job" method="post">
+
                 <div class="form-group">
                     <label for="title">Job Title</label>
                     <input type="text" id="title" name="title" placeholder="e.g. Senior Software Engineer" required>
