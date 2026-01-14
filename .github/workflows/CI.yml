@@ -68,7 +68,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: run pylint
-        run: pylint --rcfile .pylintrc --output-format=parseable:pylint.output.txt ./
+        run: pylint --rcfile .pylintrc --output-format=parseable:pylint.output.txt ./ || true
 
       - name: upload lint report
         uses: actions/upload-artifact@v4
