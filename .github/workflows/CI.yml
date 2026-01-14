@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: install requirements
+        run: pip install -r requirements.txt
+
+      - name: run tests + coverage
+        run: |
+          mkdir -p artifacts
+          pytest -v tests/ \
+            --cov=./ \
+            --cov-report=term-missing \
+            --cov-report=html:./artifacts/coverage_html \
+            --junitxml=./artifacts/junit.xml
+
+      - name: upload test artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-artifacts-${{ github.run_number }}
+          path: artifacts
+
+      - name: upload coverage html artifact
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: coverage-html
+          path: artifacts/coverage_html
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: install requirements
+        run: pip install -r requirements.txt
+
+      - name: run pylint
+        run: pylint --rcfile .pylintrc --output-format=parseable:pylint.output.txt ./
+
+      - name: upload lint report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-report-${{ github.run_number }}
+          path: pylint.output.txt
+
+  docker_build_check:
+    name: docker-build-check
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: docker build (no push)
+        run: docker build -t local/aspm:ci-check .
