@@ -5,27 +5,41 @@ from fastapi import FastAPI, Request, Depends, Form, File, UploadFile
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+from starlette.middleware import Middleware
 from starlette.status import HTTP_302_FOUND
+from starlette.middleware.sessions import SessionMiddleware
 
 from shared import get_db, engine, Base
 from models import Resume, Job
 import uuid
 
 from src.handlepdf import extract_text_from_pdf
+from src.web.auth_controller import router as auth_router
+from src.security.session import require_company_session
 
 templates = Jinja2Templates(directory="templates")
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
-    yield
-
-app = FastAPI(title="Resume–Job Matcher", lifespan=lifespan)
+APP_NAME = os.getenv("APP_NAME", "ResuMe")
+SESSION_SECRET = os.getenv("SESSION_SECRET", "dev-change-me")
+SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "3600"))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     yield
+
+middleware = [
+    Middleware(
+        SessionMiddleware,
+        secret_key=SESSION_SECRET,
+        max_age=SESSION_TTL_SECONDS,
+        same_site="lax",
+        https_only=False,
+    )
+]
+
+app = FastAPI(title="Resume–Job Matcher", lifespan=lifespan, middleware=middleware)
+app.include_router(auth_router)
 @app.get("/")
 async def root(request: Request):
     return templates.TemplateResponse(
@@ -36,19 +50,21 @@ async def root(request: Request):
 
 
 @app.get("/post_job", include_in_schema=False)
-async def post_job_page(request: Request):
-    print("POST_JOB GET URL:", str(request.url))
-    print("QUERY PARAMS:", dict(request.query_params))
-
+async def post_job_page(
+    request: Request,
+    company_id: int = Depends(require_company_session),
+):
     success = request.query_params.get("success") == "1"
-    print("SUCCESS BOOL:", success)
 
     return templates.TemplateResponse(
         request=request,
         name="post_job.html",
-        context={"company_name": "ResMe", "success": success}
+        context={
+            "company_name": "ResMe",
+            "success": success,
+            "company_id": company_id,
+        },
     )
-
 
 @app.post("/post_job")
 async def post_job(
