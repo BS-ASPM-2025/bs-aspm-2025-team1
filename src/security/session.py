@@ -3,7 +3,10 @@ from fastapi import Request, HTTPException
 from starlette.status import HTTP_303_SEE_OTHER
 
 ROLE_RECRUITER = "recruiter"
-ROLE_JOBSEEKER = "jobseeker"  # задел на будущее
+ROLE_JOBSEEKER = "jobseeker"
+
+COMPANY_LOGIN_URL = "/company/login"
+
 
 def start_company_session(request: Request, company_id: int, ttl_seconds: int) -> None:
     now = int(time.time())
@@ -28,7 +31,7 @@ def require_company_session(request: Request) -> int:
         request.session.clear()
         raise HTTPException(
             status_code=HTTP_303_SEE_OTHER,
-            headers={"Location": "/company_login"},
+            headers={"Location": COMPANY_LOGIN_URL},
         )
 
     return int(company_id)
