@@ -81,7 +81,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: >
-      github.event_name == 'pull_request' &&
+      (github.event_name == 'pull_request' || github.event.action == 'synchronize')  &&
       contains(github.event.head_commit.message, 'release v')
 
     outputs:
