@@ -84,6 +84,8 @@ jobs:
 
     outputs:
       version: ${{ steps.extract_version.outputs.VERSION }}
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Login to Docker Hub
@@ -107,6 +109,14 @@ jobs:
         run: docker tag ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }} ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}
       - name: Push Release Image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.extract_version.outputs.VERSION }}
+          name: Release ${{ steps.extract_version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
 
   deploy:
     name: deploy-to-azure
