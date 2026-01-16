@@ -13,7 +13,7 @@ def clean_text(text: str) -> str:
 
 def calculate_match_score(resume_text: str, job: Job) -> float:
     """
-    Calculate match score based on weighted criteria using simple NLP (non-AI/DL).
+    Calculate a match score based on weighted criteria using simple NLP (non-AI/DL).
     """
     scores = {}
 
@@ -22,7 +22,7 @@ def calculate_match_score(resume_text: str, job: Job) -> float:
     if job.required_skills:
         skills = [s.strip().lower() for s in job.required_skills.split(',') if s.strip()]
         if skills:
-            resume_lower = resume_text.lower()
+            resume_lower = resume_text # resume_text.lower()
             found_skills = sum(1 for skill in skills if skill in resume_lower)
             scores['skills'] = (found_skills / len(skills)) * 100
         else:
@@ -50,21 +50,23 @@ def calculate_match_score(resume_text: str, job: Job) -> float:
     scores['general'] = calculate_tfidf_similarity(job.job_text, resume_text)
 
     # Weighted Average
-    total_weight = (
-        job.weight_skills + 
-        job.weight_degree + 
-        job.weight_experience + 
-        job.weight_general
-    )
+    # Boost weights for specific requirements to ensure they dominate general text match
+    # if the requirement is present.
+    w_skills = job.skills_weight * 10 if job.required_skills else job.skills_weight
+    w_degree = job.degree_weight * 10 if job.degree else job.degree_weight
+    w_experience = job.experience_weight * 10 if job.experience else job.experience_weight
+    w_general = job.weight_general
+
+    total_weight = w_skills + w_degree + w_experience + w_general
     
     if total_weight == 0:
         return 0.0
         
     final_score = (
-        (scores.get('skills', 0) * job.weight_skills) +
-        (scores.get('degree', 0) * job.weight_degree) +
-        (scores.get('experience', 0) * job.weight_experience) +
-        (scores.get('general', 0) * job.weight_general)
+        (scores.get('skills', 0) * w_skills) +
+        (scores.get('degree', 0) * w_degree) +
+        (scores.get('experience', 0) * w_experience) +
+        (scores.get('general', 0) * w_general)
     ) / total_weight
 
     return round(final_score, 2)

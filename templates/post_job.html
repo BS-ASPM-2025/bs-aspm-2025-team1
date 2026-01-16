@@ -240,94 +240,95 @@
     </main>
 
 </body>
+    <main>
 
-<script>
-  // Fade success alert after 3 seconds
-  setTimeout(() => {
-    const el = document.querySelector('.success-alert');
-    if (el) el.remove();
-  }, 3000);
+        <script>
+          // Fade success alert after 3 seconds
+          setTimeout(() => {
+            const el = document.querySelector('.success-alert');
+            if (el) el.remove();
+          }, 3000);
 
-  // ===== Weights: must sum exactly to 100 =====
-  const REQUIRED_SUM = 100;
-  const DECIMALS = 1; // 1 => one digit after decimal. set to 0 for integers only.
+          // ===== Weights: must sum exactly to 100 =====
+          const REQUIRED_SUM = 100;
+          const DECIMALS = 1; // 1 => one digit after decimal. set to 0 for integers only.
 
-  const form = document.getElementById('postJobForm');
-  const inputs = document.querySelectorAll('.weight-input');
-  const info = document.getElementById('weightsInfo');
-  const submitBtn = document.getElementById('submitBtn');
+          const form = document.getElementById('postJobForm');
+          const inputs = document.querySelectorAll('.weight-input');
+          const info = document.getElementById('weightsInfo');
+          const submitBtn = document.getElementById('submitBtn');
 
-  const roundTo = (n, decimals) => {
-    const p = Math.pow(10, decimals);
-    return Math.round(n * p) / p;
-  };
+          const roundTo = (n, decimals) => {
+            const p = Math.pow(10, decimals);
+            return Math.round(n * p) / p;
+          };
 
-  const formatTo = (n, decimals) => {
-    return roundTo(n, decimals).toFixed(decimals);
-  };
+          const formatTo = (n, decimals) => {
+            return roundTo(n, decimals).toFixed(decimals);
+          };
 
-  const parse = (v) => {
-    const x = parseFloat(v);
-    return Number.isFinite(x) ? x : 0;
-  };
+          const parse = (v) => {
+            const x = parseFloat(v);
+            return Number.isFinite(x) ? x : 0;
+          };
 
-  const updateWeightsUI = () => {
-    let sum = 0;
-    inputs.forEach(i => sum += parse(i.value));
-    sum = roundTo(sum, DECIMALS);
+          const updateWeightsUI = () => {
+            let sum = 0;
+            inputs.forEach(i => sum += parse(i.value));
+            sum = roundTo(sum, DECIMALS);
 
-    const ok = (sum === REQUIRED_SUM);
+            const ok = (sum === REQUIRED_SUM);
 
-    if (info) {
-      info.textContent = ok
-        ? `✓ Weights total = ${formatTo(sum, DECIMALS)} / ${REQUIRED_SUM}`
-        : `Weights total: ${formatTo(sum, DECIMALS)} / ${REQUIRED_SUM} (must equal ${REQUIRED_SUM})`;
-      info.style.color = ok ? '#166534' : '#b91c1c';
-    }
+            if (info) {
+              info.textContent = ok
+                ? `✓ Weights total = ${formatTo(sum, DECIMALS)} / ${REQUIRED_SUM}`
+                : `Weights total: ${formatTo(sum, DECIMALS)} / ${REQUIRED_SUM} (must equal ${REQUIRED_SUM})`;
+              info.style.color = ok ? '#166534' : '#b91c1c';
+            }
 
-    if (submitBtn) submitBtn.disabled = !ok;
-  };
+            if (submitBtn) submitBtn.disabled = !ok;
+          };
 
-  // Keep values within allowed min/max + snap to 1 decimal on blur
-  inputs.forEach(input => {
-    input.addEventListener('input', () => {
-      // enforce min/max live (optional but nice)
-      const min = input.min !== '' ? parseFloat(input.min) : -Infinity;
-      const max = input.max !== '' ? parseFloat(input.max) : Infinity;
-      let v = parse(input.value);
+          // Keep values within allowed min/max + snap to 1 decimal on blur
+          inputs.forEach(input => {
+            input.addEventListener('input', () => {
+              // enforce min/max live (optional but nice)
+              const min = input.min !== '' ? parseFloat(input.min) : -Infinity;
+              const max = input.max !== '' ? parseFloat(input.max) : Infinity;
+              let v = parse(input.value);
 
-      if (v < min) v = min;
-      if (v > max) v = max;
+              if (v < min) v = min;
+              if (v > max) v = max;
 
-      input.value = v; // keep raw while typing
-      updateWeightsUI();
-    });
+              input.value = v; // keep raw while typing
+              updateWeightsUI();
+            });
 
-    input.addEventListener('blur', () => {
-      // snap to DECIMALS digits on blur
-      const v = parse(input.value);
-      input.value = formatTo(v, DECIMALS);
-      updateWeightsUI();
-    });
-  });
+            input.addEventListener('blur', () => {
+              // snap to DECIMALS digits on blur
+              const v = parse(input.value);
+              input.value = formatTo(v, DECIMALS);
+              updateWeightsUI();
+            });
+          });
 
-  // Final guard: prevent submit if not exactly 100 (even if someone bypasses disabled button)
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      let sum = 0;
-      inputs.forEach(i => sum += parse(i.value));
-      sum = roundTo(sum, DECIMALS);
+          // Final guard: prevent submit if not exactly 100 (even if someone bypasses disabled button)
+          if (form) {
+            form.addEventListener('submit', (e) => {
+              let sum = 0;
+              inputs.forEach(i => sum += parse(i.value));
+              sum = roundTo(sum, DECIMALS);
 
-      if (sum !== REQUIRED_SUM) {
-        e.preventDefault();
-        updateWeightsUI();
-        alert(`Weights must sum exactly to ${REQUIRED_SUM}. Current total: ${formatTo(sum, DECIMALS)}.`);
-      }
-    });
-  }
+              if (sum !== REQUIRED_SUM) {
+                e.preventDefault();
+                updateWeightsUI();
+                alert(`Weights must sum exactly to ${REQUIRED_SUM}. Current total: ${formatTo(sum, DECIMALS)}.`);
+              }
+            });
+          }
 
-  // Initialize on load
-  updateWeightsUI();
-</script>
+          // Initialize on load
+          updateWeightsUI();
+        </script>
 
 </html>
