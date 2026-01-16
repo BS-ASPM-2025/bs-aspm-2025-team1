@@ -80,7 +80,7 @@ jobs:
     name: create release
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev' && contains(github.event.head_commit.message, 'release')
+    if: github.ref == 'refs/heads/BSASPM25T1-48' && contains(github.event.head_commit.message, 'release')
     outputs:
       version: ${{ steps.extract_version.outputs.VERSION }}
     steps:
@@ -106,7 +106,7 @@ jobs:
     name: deploy-to-azure
     needs: [build, release]
     runs-on: ubuntu-latest
-    if: always() && needs.build.result == 'success' && (needs.release.result == 'success' || needs.release.result == 'skipped') && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev')
+    if: always() && needs.build.result == 'success' && (needs.release.result == 'success' || needs.release.result == 'skipped') && (github.event_name == 'pull_request' || github.ref == 'refs/heads/BSASPM25T1-48')
     environment:
       name: Development
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
