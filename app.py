@@ -15,7 +15,7 @@ import uuid
 
 from src.handlepdf import extract_text_from_pdf
 from src.web.auth_controller import router as auth_router
-from src.security.session import require_company_session
+from src.web.job_controller import router as job_router
 
 templates = Jinja2Templates(directory="templates")
 
@@ -40,6 +40,7 @@ middleware = [
 
 app = FastAPI(title="Resume–Job Matcher", lifespan=lifespan, middleware=middleware)
 app.include_router(auth_router)
+app.include_router(job_router)
 @app.get("/")
 async def root(request: Request):
     return templates.TemplateResponse(
@@ -47,66 +48,6 @@ async def root(request: Request):
         name="index.html",
         context={"company_name": "ResMe"}
     )
-
-
-@app.get("/post_job", include_in_schema=False)
-async def post_job_page(
-    request: Request,
-    company_id: int = Depends(require_company_session),
-):
-    success = request.query_params.get("success") == "1"
-
-    return templates.TemplateResponse(
-        request=request,
-        name="post_job.html",
-        context={
-            "company_name": "ResMe",
-            "success": success,
-            "company_id": company_id,
-        },
-    )
-
-@app.post("/post_job")
-async def post_job(
-        request: Request,
-        title: str = Form(...),
-        #company: str = Form(...),
-        degree: str = Form(...),
-        experience: str = Form(...),
-        required_skills: str = Form(...),
-        job_text: str = Form(...),
-        db: Session = Depends(get_db)
-):
-    # Combine fields for match algorithm text
-    combined_text = f"Title: {title}\nSkills: {required_skills}\nDegree: {degree}\nExperience: {experience}\n\nDescription:\n{job_text}"
-
-    # Create simple ID (in real app use UUID)
-    id_text = str(uuid.uuid4())
-
-    new_job = Job(
-        title=title,
-        #company=company,
-        degree=degree,
-        experience=experience,
-        required_skills=required_skills,
-        job_text=combined_text,  # Using combined text for searching logic compatibility
-        id_text=id_text
-    )
-
-    db.add(new_job)
-    db.commit()
-    db.refresh(new_job)
-
-    # Redirect home or to confirmation. For now home.
-    return RedirectResponse(url="/post_job_feedback", status_code=303)
-
-
-@app.get("/post_job_feedback", include_in_schema=False)
-async def post_job_feedback_page(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="post_job_feedback.html",
-        context={"company_name": "ResuMe"})
 
 @app.get("/upload_resume", include_in_schema=False)
 async def hello_page(request: Request):

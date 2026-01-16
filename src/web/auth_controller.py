@@ -43,4 +43,4 @@ async def auth_company(
     ttl = int(os.getenv("SESSION_TTL_SECONDS", "3600"))
     start_company_session(request, company_id=company.id, ttl_seconds=ttl)
 
-    return RedirectResponse(url="/post_job", status_code=303)
+    return RedirectResponse(url="/jobs/manage", status_code=303)
