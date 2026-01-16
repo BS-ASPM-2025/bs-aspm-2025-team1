@@ -8,7 +8,6 @@ ROLE_JOBSEEKER = "jobseeker"
 
 COMPANY_LOGIN_URL = "/company/login"
 
-# 30 минут по умолчанию (можно переопределить через env)
 SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "1800"))
 
 
@@ -18,9 +17,9 @@ def start_company_session(request: Request, company_id: int, ttl_seconds: int = 
     request.session.update({
         "company_id": int(company_id),
         "role": ROLE_RECRUITER,
-        "iat": now,          # время старта сессии (первый логин)
-        "last": now,         # последнее действие
-        "exp": now + int(ttl_seconds),  # истечение по неактивности
+        "iat": now,
+        "last": now,
+        "exp": now + int(ttl_seconds),
     })
 
 
