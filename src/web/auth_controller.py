@@ -20,10 +20,25 @@ _company_auth_service = CompanyAuthService(_company_repo)
 
 @router.get("/company/login", include_in_schema=False)
 async def company_login_page(request: Request):
+    err = request.query_params.get("err")
+
+    error_msg = None
+    if err == "session_expired":
+        error_msg = "Your session expired. Please enter the company password again."
+    elif err == "access_denied":
+        error_msg = "Access denied."
+    elif err == "invalid_credentials":
+        error_msg = "Invalid company name or password"
+    elif err:
+        error_msg = "Login required."
+
     return templates.TemplateResponse(
         request=request,
         name="company_login.html",
-        context={"company_name": "ResMe"}
+        context={
+            "company_name": "ResMe",
+            "error": error_msg,
+        },
     )
 
 
@@ -36,11 +51,7 @@ async def auth_company(
 ):
     company = _company_auth_service.authenticate(db, company_name, password)
     if not company:
-        return templates.TemplateResponse(
-            request=request,
-            name="company_login.html",
-            context={"company_name": "ResMe", "error": "Invalid company name or password"}
-        )
+        return RedirectResponse(url="/company/login?err=invalid_credentials", status_code=303)
 
     ttl = int(os.getenv("SESSION_TTL_SECONDS", "3600"))
     start_company_session(request, company_id=company.id, ttl_seconds=ttl)
