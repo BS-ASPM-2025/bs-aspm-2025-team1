@@ -1,3 +1,8 @@
+"""
+
+Configuration for pytest to set up a test database and provide a TestClient for FastAPI application.
+
+"""
 
 import pytest
 from fastapi.testclient import TestClient
