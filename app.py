@@ -228,5 +228,10 @@ async def passcode_submit(password: str = Form(...)):
     return RedirectResponse(url="/", status_code=303)
 
 if __name__ == '__main__':
+    """
+    
+    Run the application with Uvicorn.
+    
+    """
     import uvicorn
     uvicorn.run("app:app", port=8000,host='0.0.0.0', reload=False, workers=4)
