@@ -80,7 +80,7 @@ jobs:
     name: create release
     needs: build
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.meaasage, 'release v')
+    if: contains(github.event.pull_request.meaasage, 'release v') || contains(github.event.pull_request.title, 'release v')
     outputs:
       version: ${{ steps.extract_version.outputs.VERSION }}
     steps:
