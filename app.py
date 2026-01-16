@@ -21,7 +21,7 @@ templates = Jinja2Templates(directory="templates")
 
 APP_NAME = os.getenv("APP_NAME", "ResuMe")
 SESSION_SECRET = os.getenv("SESSION_SECRET", "dev-change-me")
-SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "3600"))
+SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "1800"))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
