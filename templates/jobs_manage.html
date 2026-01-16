@@ -247,6 +247,41 @@
       border-top: 1px solid var(--border-color);
       background: #fff;
     }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    nav a {
+      margin-left: 0;
+    }
+
+    .logout-form {
+      margin-left: auto;
+    }
+
+    .logout-btn {
+      background-color: var(--primary-color);
+      color: #fff;
+      border: 1px solid transparent;
+      border-radius: 0.75rem;
+      padding: 0.65rem 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.15s;
+      white-space: nowrap;
+    }
+
+    .logout-btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .logout-btn:active {
+      transform: translateY(1px);
+    }
+
   </style>
 </head>
 
@@ -254,12 +289,23 @@
 
   <header>
     <a href="/" class="logo">{{ company_name }}</a>
+
     <nav>
       <a href="/">Home</a>
       <a href="/upload_resume">Resume</a>
       <a href="/jobs/manage">Jobs</a>
       <a href="#">Contact</a>
+
+      <form
+        class="logout-form"
+        action="/logout"
+        method="post"
+        onsubmit="return confirm('Logout now?');"
+      >
+        <button type="submit" class="logout-btn">Logout</button>
+      </form>
     </nav>
+
   </header>
 
   <main>

@@ -43,3 +43,7 @@ def require_company_session(request: Request) -> int:
     sess["exp"] = now + SESSION_TTL_SECONDS
 
     return int(company_id)
+
+
+def logout(request: Request) -> None:
+    request.session.clear()
