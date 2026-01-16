@@ -81,6 +81,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/dev' && contains(github.event.head_commit.message, 'release')
+    outputs:
+      version: ${{ steps.extract_version.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v4
       - name: Login to Docker Hub
@@ -102,9 +104,9 @@ jobs:
 
   deploy:
     name: deploy-to-azure
-    needs: build
+    needs: [build, release]
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || github.base_ref == 'dev'
+    if: always() && needs.build.result == 'success' && (needs.release.result == 'success' || needs.release.result == 'skipped') && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev')
     environment:
       name: Development
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
@@ -120,4 +122,4 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: "projectmanagement"
-          images: "${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }}"
+          images: "${{ secrets.DOCKER_USERNAME }}/aspm:${{ needs.release.outputs.version != '' && needs.release.outputs.version || format('team1-{0}-{1}', github.actor, github.run_number) }}"
