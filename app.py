@@ -1,3 +1,9 @@
+"""
+
+Main application file for Resume–Job Matcher using FastAPI.
+
+"""
+
 import os
 import shutil
 from contextlib import asynccontextmanager
