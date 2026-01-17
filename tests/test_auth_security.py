@@ -138,7 +138,7 @@ def test_logout_invalidates_session(client):
     client.post("/logout")
     
     # Verify session is cleared/invalidated
-    # Cookie might still be there but empty, or server rejects it.
+    # Cookie might still be there but empty, or the server rejects it.
     resp = client.get("/jobs/manage", follow_redirects=False)
     assert resp.status_code == 303
     assert "/company/login" in resp.headers["location"]
