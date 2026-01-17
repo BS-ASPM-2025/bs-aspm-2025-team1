@@ -1,4 +1,4 @@
-name: Countinues Development Pipeline
+name: Continues Development Pipeline
 
 on:
   push:
