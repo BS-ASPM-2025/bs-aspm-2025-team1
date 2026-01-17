@@ -9,8 +9,8 @@ Resume Model:
 
 """
 
-from sqlalchemy import Column, Integer, Text, DateTime
 from datetime import datetime
+from sqlalchemy import Column, Integer, Text, DateTime
 from shared.database import Base
 
 
