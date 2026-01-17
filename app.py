@@ -125,6 +125,14 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     db.refresh(resume_test)
     return RedirectResponse(url="/resume_upload_feedback", status_code=303)
 
+@app.get("/hr_job_list", include_in_schema=False)
+async def hr_job_list_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="hr_job_list.html",
+    )
+
+
 @app.get("/resume_upload_feedback", include_in_schema=False)
 async def resume_upload_feedback_page(request: Request):
     """
