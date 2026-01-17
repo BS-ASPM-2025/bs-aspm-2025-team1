@@ -1,3 +1,10 @@
+"""
+
+Main application file for the Resume–Job Matcher web application.
+Sets up FastAPI app, routes, and middleware.
+
+"""
+
 import os
 import shutil
 from contextlib import asynccontextmanager
@@ -39,6 +46,11 @@ app.include_router(auth_router)
 app.include_router(job_router)
 @app.get("/")
 async def root(request: Request):
+    """
+    Render the home page.
+    :param request: FastAPI Request object
+    :return: Rendered HTML response
+    """
     return templates.TemplateResponse(
         request=request,
         name="index.html",
@@ -47,6 +59,11 @@ async def root(request: Request):
 
 @app.get("/upload_resume", include_in_schema=False)
 async def hello_page(request: Request):
+    """
+    Render the resume upload page.
+    :param request: FastAPI Request object
+    :return: Rendered HTML response
+    """
     return templates.TemplateResponse(
         request=request,
         name="upload_resume.html",
@@ -54,7 +71,13 @@ async def hello_page(request: Request):
     )
 @app.post("/upload_resume")
 async def upload_resume(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
-
+    """
+    Handle resume file upload, validate, extract text, and store in a database.
+    :param request: FastAPI Request object
+    :param file: Uploaded resume file
+    :param db: Database session
+    :return: Redirect to feedback page on success or render upload page with error
+    """
     #Validation
     ALLOWED_TYPES = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
     MAX_SIZE = 5 * 1024 * 1024  # 5MB
@@ -104,6 +127,11 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
 
 @app.get("/resume_upload_feedback", include_in_schema=False)
 async def resume_upload_feedback_page(request: Request):
+    """
+    Render the resume upload feedback page.
+    :param request: FastAPI Request object
+    :return: Rendered HTML response
+    """
     return templates.TemplateResponse(
         request=request,
         name="resume_upload_feedback.html",
