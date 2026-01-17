@@ -4,8 +4,6 @@ This file tests the API endpoints for uploading a resume.
 
 """
 
-import pytest
-from app import app
 import io
 # client fixture is provided by conftest.py
 
@@ -19,7 +17,7 @@ def test_upload_file_too_large(client):
     # Create a dummy file larger than 5MB
     large_content = b"a" * (5 * 1024 * 1024 + 100)
     files = {"file": ("large_file.pdf", io.BytesIO(large_content), "application/pdf")}
-    
+
     response = client.post("/upload_resume", files=files)
     
     # Expect 200 OK because we render the template with an error message
