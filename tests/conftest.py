@@ -1,6 +1,6 @@
 """
 
-Configuration for pytest to set up a test database and provide a TestClient for FastAPI app.
+Configuration for pytest to set up a test database and provide a TestClient for the FastAPI app.
 
 """
 
@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from shared import Base, get_db
 from app import app
 
-# Create test database
+# Create a test database
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test_shared.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
