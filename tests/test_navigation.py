@@ -34,13 +34,13 @@ def test_passcode_post_redirects_to_post_job(client):
     assert r.status_code in (302, 303)
     assert r.headers["location"] == "/post_job"
 
-def test_post_job_get_loads(client):
-    """
-    Tests that the post job page loads successfully.
-    :param client: TestClient fixture provided by conftest.py
-    :return: None
-    """
-    r = client.get("/post_job")
+def test_post_job_get_requires_company_session(client):
+    r = client.get("/post_job", follow_redirects=False)
+    assert r.status_code in (302, 303)
+    assert r.headers["location"] == "/company/login"
+
+def test_company_login_get_loads(client):
+    r = client.get("/company/login")
     assert r.status_code == 200
 
 def upload_resume_job_get_loads(client):
