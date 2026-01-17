@@ -55,8 +55,9 @@ jobs:
       - name: install-dependencies
         run: pip install -r requirements.txt
       - name: run-lint
-        run: pylint --rcfile .pylintrc --output-format=parseable:art_pylint_${{ github.run_number }}.output.txt ./ || true
+        run: pylint --rcfile .pylintrc --fail-under=7 --output-format=parseable:art_pylint_${{ github.run_number }}.output.txt ./
       - name: upload-lint-report
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: linter-report-${{ github.run_number }}
