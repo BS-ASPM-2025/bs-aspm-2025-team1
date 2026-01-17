@@ -146,33 +146,52 @@
 
 <body>
 
-    <div class="upload-card">
-        <h1>Upload Your Resume</h1>
-        <p class="subtitle">Please upload your resume in PDF format</p>
+    <div class="cards-wrapper">
 
-        {% if error %}
-        <div class="error-alert">
-            {{ error }}
-        </div>
-        {% endif %}
+        <!-- CARD 1: Upload Resume -->
+        <div class="upload-card">
+            <h1>Upload Your Resume</h1>
+            <p class="subtitle">Please upload your resume in PDF format</p>
 
-        <form action="/upload_resume" method="post" enctype="multipart/form-data">
-            <div class="drop-zone" id="drop-zone">
-                <div class="icon-container">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                        </path>
-                    </svg>
-                </div>
-                <div class="drop-text">Click or Drag & Drop to Upload</div>
-                <div class="drop-subtext">PDF files only (max 5MB)</div>
-                <input type="file" name="file" id="file-input" accept=".pdf" required>
+            {% if error %}
+            <div class="error-alert">
+                {{ error }}
             </div>
-            <div id="file-name"></div>
-            <button type="submit" class="btn-upload">Upload Resume</button>
-        </form>
+            {% endif %}
+
+            <form action="/upload_resume" method="post" enctype="multipart/form-data">
+                <div class="drop-zone" id="drop-zone">
+                    <div class="icon-container">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                            </path>
+                        </svg>
+                    </div>
+                    <div class="drop-text">Click or Drag & Drop to Upload</div>
+                    <div class="drop-subtext">PDF files only (max 5MB)</div>
+                    <input type="file" name="file" id="file-input" accept=".pdf" required>
+                </div>
+                <div id="file-name"></div>
+                <button type="submit" class="btn-upload">Upload Resume</button>
+            </form>
+        </div>
+
+        <!-- CARD 2: Browse Jobs -->
+        <div class="upload-card">
+            <h1>Explore Job Opportunities</h1>
+            <p class="subtitle">View all open positions in the system</p>
+
+            <a href="/hr_job_list">
+                <button class="btn-upload">
+                    Browse All Jobs
+                </button>
+            </a>
+        </div>
+
     </div>
+
 
     <script>
         const fileInput = document.getElementById('file-input');
