@@ -80,7 +80,7 @@ jobs:
     name: create release
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' && (github.event.action == 'opened'||github.event.action == 'synchronize') && github.base_ref == 'dev'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
 
     outputs:
       version: ${{ steps.extract_version.outputs.VERSION }}
