@@ -74,10 +74,15 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Sanitize Actor
+        id: actor_sanitize
+        run: |
+          SANITIZED_ACTOR=$(echo "${{ github.actor }}" | tr -d '[]')
+          echo "sanitized_actor=$SANITIZED_ACTOR" >> "$GITHUB_OUTPUT"
       - name: build-image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }} .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ steps.actor_sanitize.outputs.sanitized_actor }}-${{ github.run_number }} .
       - name: push-image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }}
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ steps.actor_sanitize.outputs.sanitized_actor }}-${{ github.run_number }}
 
   release:
     name: create release
@@ -122,11 +127,16 @@ jobs:
               // Optional: Fail if strict, or just leave empty to skip
               // core.setFailed('No release tag found in commit message or PR title');
             }
+      - name: Sanitize Actor
+        id: actor_sanitize
+        run: |
+          SANITIZED_ACTOR=$(echo "${{ github.actor }}" | tr -d '[]')
+          echo "sanitized_actor=$SANITIZED_ACTOR" >> "$GITHUB_OUTPUT"
       - name: Pull Docker Image
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }}
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ steps.actor_sanitize.outputs.sanitized_actor }}-${{ github.run_number }}
       - name: Tag Release Image
         if: steps.extract_version.outputs.VERSION != ''
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ github.actor }}-${{ github.run_number }} ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ steps.actor_sanitize.outputs.sanitized_actor }}-${{ github.run_number }} ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}
       - name: Push Release Image
         if: steps.extract_version.outputs.VERSION != ''
         run: docker push ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}
@@ -156,9 +166,14 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Sanitize Actor
+        id: actor_sanitize
+        run: |
+          SANITIZED_ACTOR=$(echo "${{ github.actor }}" | tr -d '[]')
+          echo "sanitized_actor=$SANITIZED_ACTOR" >> "$GITHUB_OUTPUT"
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: "projectmanagement"
-          images: "${{ secrets.DOCKER_USERNAME }}/aspm:${{ needs.release.outputs.version != '' && needs.release.outputs.version || format('team1-{0}-{1}', github.actor, github.run_number) }}"
+          images: "${{ secrets.DOCKER_USERNAME }}/aspm:${{ needs.release.outputs.version != '' && needs.release.outputs.version || format('team1-{0}-{1}', steps.actor_sanitize.outputs.sanitized_actor, github.run_number) }}"
