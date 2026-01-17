@@ -35,11 +35,20 @@ def test_passcode_post_redirects_to_post_job(client):
     assert r.headers["location"] == "/post_job"
 
 def test_post_job_get_requires_company_session(client):
+    """
+    Tests that accessing the post job page without a company session redirects to log in.
+    :param client: TestClient fixture provided by conftest.py
+    :return: None
+    """
     r = client.get("/post_job", follow_redirects=False)
     assert r.status_code in (302, 303)
     assert r.headers["location"] == "/company/login"
 
 def test_company_login_get_loads(client):
+    """
+    Tests that the company login page loads successfully.
+    :param client: TestClient fixture provided by conftest.py
+    """
     r = client.get("/company/login")
     assert r.status_code == 200
 
