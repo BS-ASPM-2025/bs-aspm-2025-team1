@@ -3,6 +3,7 @@
 Configuration for pytest to set up a test database and provide a TestClient for the FastAPI app.
 
 """
+import os
 import sqlite3
 import pytest
 from fastapi.testclient import TestClient
@@ -19,6 +20,12 @@ from app import app
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test_shared.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+@pytest.fixture(scope="session", autouse=True)
+def _force_project_root_cwd():
+    # move cwd to project root (one level above tests/)
+    root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    os.chdir(root)
 
 # Override dependency
 def override_get_db():

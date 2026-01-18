@@ -3,6 +3,8 @@
 Tests for navigation between different pages of the FastAPI application.
 
 """
+from src.web.auth_controller import templates
+
 
 def test_index_loads(client):
     """
@@ -50,6 +52,7 @@ def test_company_login_get_loads(client):
     :param client: TestClient fixture provided by conftest.py
     """
     r = client.get("/company/login")
+    print("TEMPLATES SEARCHPATH:", templates.env.loader.searchpath)
     assert r.status_code == 200
 
 def upload_resume_job_get_loads(client):

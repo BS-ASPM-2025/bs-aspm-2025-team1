@@ -9,6 +9,11 @@ from shared import get_db
 from src.repositories.company_repository import CompanyRepository
 from src.security.auth.company_auth_service import CompanyAuthService
 from src.security.session import start_company_session, logout
+import os
+from fastapi.templating import Jinja2Templates
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 router = APIRouter()
 
@@ -17,6 +22,7 @@ templates = Jinja2Templates(directory="templates")
 _company_repo = CompanyRepository()
 _company_auth_service = CompanyAuthService(_company_repo)
 
+print("AUTH_CONTROLLER FILE:", __file__)
 
 @router.get("/company/login", include_in_schema=False)
 async def company_login_page(request: Request):
