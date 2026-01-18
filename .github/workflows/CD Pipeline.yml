@@ -88,7 +88,7 @@ jobs:
     name: create release
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev' && contains(github.event.head_commit.message, 'release v')
 
     outputs:
       version: ${{ steps.extract_version.outputs.VERSION }}
@@ -107,16 +107,13 @@ jobs:
         with:
           script: |
             let msg = '';
-            // For Pull Requests, looking at the Title is standard and easier to control
-            if (context.eventName === 'pull_request') {
+            if (context.eventName === 'pull_request' && context.payload.pull_request) {
               msg = context.payload.pull_request.title;
               console.log('Checking PR Title: ' + msg);
             } else {
-              // For Push events, check the commit message
-              msg = context.payload.head_commit.message;
+              msg = context.payload.head_commit?.message || '';
               console.log('Checking Commit Message: ' + msg);
             }
-
             // Extract "release vX.Y.Z"
             const match = msg.match(/release\s+(v?\d+\.\d+\.\d+)/);
             if (match && match[1]) {
