@@ -8,26 +8,20 @@ Sets up FastAPI app, routes, and middleware.
 import os
 import shutil
 from contextlib import asynccontextmanager
-
-import sqlite3
-from fastapi import FastAPI, Request, Depends, Form, File, UploadFile, HTTPException
+from fastapi import FastAPI, Request, Depends, Form, File, UploadFile
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from starlette.middleware import Middleware
 from starlette.middleware.sessions import SessionMiddleware
-from starlette.responses import HTMLResponse
-
 from shared import get_db, engine, Base
 from models import Resume
 from src.handlepdf import extract_text_from_pdf
 from src.web.auth_controller import router as auth_router
 from src.web.job_controller import router as job_router
-from typing import Generator
 
 templates = Jinja2Templates(directory="templates")
 
-DB_PATH = "my_database.db"
 APP_NAME = os.getenv("APP_NAME", "ResuMe")
 SESSION_SECRET = os.getenv("SESSION_SECRET", "dev-change-me")
 SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "1800"))
@@ -62,7 +56,7 @@ async def root(request: Request):
         name="index.html",
         context={"company_name": "ResMe"}
     )
-#--------------------------------------------------------------
+
 @app.get("/upload_resume", include_in_schema=False)
 async def hello_page(request: Request):
     """
@@ -131,7 +125,13 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     db.refresh(resume_test)
     return RedirectResponse(url="/resume_upload_feedback", status_code=303)
 
-#--------------------------------------------------------------
+@app.get("/hr_job_list", include_in_schema=False)
+async def hr_job_list_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="hr_job_list.html",
+    )
+
 
 @app.get("/resume_upload_feedback", include_in_schema=False)
 async def resume_upload_feedback_page(request: Request):
@@ -150,7 +150,6 @@ async def resume_upload_feedback_page(request: Request):
 #async def resume_upload_feedback_return(password: str = Form(...)):
 #    return RedirectResponse(url="/", status_code=303)
 
-#--------------------------------------------------------------
 @app.get("/passcode", include_in_schema=False)
 async def passcode_page(request: Request):
     return templates.TemplateResponse(
@@ -166,53 +165,3 @@ async def passcode_submit(password: str = Form(...)):
 if __name__ == '__main__':
     import uvicorn
     uvicorn.run("app:app", port=8000,host='0.0.0.0', reload=False, workers=4)
-
-#--------------------------------------------------------------
-
-def get_sqlite_conn():
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    try:
-        yield conn
-    finally:
-        conn.close()
-
-
-@app.get("/jobs_list", include_in_schema=False)
-async def jobs_list(
-    request: Request,
-    conn: sqlite3.Connection = Depends(get_sqlite_conn)
-):
-    try:
-        cur = conn.execute("""
-            SELECT
-                id,
-                title,
-                company,
-                degree,
-                degree_weight,
-                experience,
-                required_skills,
-                skills_weight,
-                job_text
-            FROM jobs
-            ORDER BY id DESC
-        """)
-        jobs = cur.fetchall()
-
-        return templates.TemplateResponse(
-            "JOBS_LIST.html",
-            {
-                "request": request,
-                "company_name": "ResMe",
-                "jobs": jobs
-            }
-        )
-
-    except Exception as e:
-        print("JOBS_LIST ERROR:", repr(e))
-        return HTMLResponse(
-            f"<h2>JOBS_LIST ERROR</h2><pre>{repr(e)}</pre>",
-            status_code=500
-        )
-

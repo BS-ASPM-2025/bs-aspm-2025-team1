@@ -34,7 +34,7 @@
             border-radius: 1rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
             text-align: center;
         }
 
@@ -111,7 +111,7 @@
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
             font-weight: 500;
-            width: 90%;
+            width: 100%;
             margin-top: 1.5rem;
             cursor: pointer;
             transition: background-color 0.2s;
@@ -141,15 +141,6 @@
         margin: 1rem 0 1.5rem;
         font-weight: 600;
     }
-
-    .btn-upload {
-        display: inline-block;
-        text-align: center;
-        text-decoration: none;
-        width: 90%;
-        font-size: 1rem;
-    }
-
     </style>
 </head>
 
@@ -192,8 +183,11 @@
             <h1>Explore Job Opportunities</h1>
             <p class="subtitle">View all open positions in the system</p>
 
-            <a class="btn-upload" href="/jobs_list">Browse All Jobs</a>
-
+            <a href="/hr_job_list">
+                <button class="btn-upload">
+                    Browse All Jobs
+                </button>
+            </a>
         </div>
 
     </div>
