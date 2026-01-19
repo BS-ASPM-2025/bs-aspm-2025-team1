@@ -4,20 +4,38 @@ on:
     types: [closed]
     branches: ["dev"]
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Continues Development Pipeline"]
+    types:
+      - completed
+    branches: ["dev"]
+  push:
+    tags:
+      - 'v*'
+
 jobs:
   build:
     name: build docker image
     runs-on: ubuntu-latest
+    # Only run if the CD pipeline succeeded and PR has 'release' in title
+    if: |
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && 
+       contains(github.event.workflow_run.head_commit.message, 'release')) ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true && 
+       contains(github.event.pull_request.title, 'release')) ||
+      github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
         with:
-            fetch-depth: 0
-            ref: dev
+          ref: dev  # Always check out dev branch
+          fetch-depth: 0  # Fetch all history for proper tagging
+
       - name: login-docker
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Sanitize Actor
         id: actor_sanitize
         run: |
@@ -52,9 +70,12 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     if: |
-          (github.event.pull_request.merged == true &&
+          needs.build.result == 'success' &&
+          ((github.event.pull_request.merged == true &&
           contains(github.event.pull_request.title, 'release')) ||
-          startsWith(github.ref, 'refs/tags/v')
+          startsWith(github.ref, 'refs/tags/v') ||
+          (github.event_name == 'workflow_run' && 
+           contains(github.event.workflow_run.head_commit.message, 'release')))
     outputs:
       version: ${{ steps.extract_version.outputs.VERSION }}
     permissions:
@@ -102,6 +123,16 @@ jobs:
               if (match) {
                 version = match[1];
                 console.log('Version from PR title:', version);
+              }
+            }
+            // Check if triggered by workflow_run (from CD pipeline)
+            else if (context.payload.workflow_run) {
+              const msg = context.payload.workflow_run.head_commit.message || '';
+              console.log('Commit message:', msg);
+              const match = msg.match(/release\s+(v\d+\.\d+\.\d+)/i);
+              if (match) {
+                version = match[1];
+                console.log('Version from commit message:', version);
               }
             }
             
@@ -164,3 +195,26 @@ jobs:
           echo "\`docker pull ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Built from:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+
+  deploy:
+    name: deploy-to-azure
+    needs: [ build, release ]
+    runs-on: ubuntu-latest
+    if: always() && needs.build.result == 'success' && needs.release.result == 'success'
+    environment:
+      name: Development
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "projectmanagement"
+          images: "${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}"
