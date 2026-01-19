@@ -89,4 +89,14 @@ jobs:
           name: Release ${{ steps.extract_version.outputs.VERSION }}
           draft: false
           prerelease: false
+          body: |
+            🚀 Docker Image:
+            ```
+            docker pull ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}
+            ```
           generate_release_notes: true
+
+      - name: Add Docker Image to Summary
+        run: |
+          echo "## 🐳 Docker Image" >> $GITHUB_STEP_SUMMARY
+          echo "\`docker pull ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
