@@ -11,7 +11,7 @@ class Company(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     company_name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    password_hash: Mapped[str] = mapped_column("password_hash",String, nullable=False)
+    password_hash: Mapped[str] = mapped_column(String, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
