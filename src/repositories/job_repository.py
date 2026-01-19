@@ -2,7 +2,7 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import select, desc
 
-from models import Job
+from src.models import Job
 
 class JobRepository:
     def create(self, db: Session, job: Job) -> Job:
@@ -11,10 +11,10 @@ class JobRepository:
         db.refresh(job)
         return job
 
-    def find_by_company_name(self, db: Session, company_name: str) -> List[Job]:
+    def find_by_company_id(self, db: Session, company_id: int) -> List[Job]:
         stmt = (
             select(Job)
-            .where(Job.company == company_name)
+            .where(Job.company_id == int(company_id))
             .order_by(desc(Job.created_at))
         )
         return list(db.scalars(stmt).all())

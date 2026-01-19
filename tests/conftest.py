@@ -2,7 +2,7 @@
 
 Configuration for pytest to set up a test database and provide a TestClient for the FastAPI app.
 
-"""
+
 
 import pytest
 from fastapi.testclient import TestClient
@@ -18,12 +18,12 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 # Override dependency
 def override_get_db():
-    """
+
     Dependency override to provide a database session for testing.
     Yields:
         db: SQLAlchemy Session connected to the test database
 
-    """
+
     try:
         db = TestingSessionLocal()
         yield db
@@ -34,14 +34,15 @@ app.dependency_overrides[get_db] = override_get_db
 
 @pytest.fixture(scope="module")
 def client():
-    """
+
     Pytest fixture to provide a TestClient for the FastAPI app with a test database.
     Sets up the database schema before tests and tears it down afterward.
     Yields:
         TestClient: FastAPI TestClient instance
 
-    """
+
     Base.metadata.create_all(bind=engine)
     with TestClient(app) as c:
         yield c
     Base.metadata.drop_all(bind=engine)
+"""
