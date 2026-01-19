@@ -107,6 +107,7 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     resume_test = Resume(
         raw_text=text,
         source_id_text=file.filename
+       # job_seeker_id= тут надо id искателя вакансии
     )
     db.add(resume_test)
     db.commit()
