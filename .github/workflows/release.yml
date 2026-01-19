@@ -14,6 +14,7 @@ on:
       - 'v*'
 
 jobs:
+
   build:
     name: build docker image
     runs-on: ubuntu-latest
@@ -195,3 +196,26 @@ jobs:
           echo "\`docker pull ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Built from:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+
+  deploy:
+    name: deploy-to-azure
+    needs: [ build, release ]
+    runs-on: ubuntu-latest
+    if: always() && needs.build.result == 'success' && needs.release.result == 'success'
+    environment:
+      name: Development
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "projectmanagement"
+          images: "${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}"
