@@ -1,0 +1,17 @@
+name:
+ResMe
+pass:
+Test1234!
+
+INSERT INTO companies (company_name, password_hash, created_at)
+VALUES (
+  'ResMe',
+  '$2b$12$RDQb5kON0nWLbfss/pyoD.B7qpKeeHJIrtlQ6aIx7QMWZb1PdKVQG',
+  CURRENT_TIMESTAMP
+);
+
+SELECT id, company_name, password, created_at
+FROM companies
+WHERE company_name = 'ResMe';
+
+DELETE FROM companies WHERE company_name = 'ResMe';
