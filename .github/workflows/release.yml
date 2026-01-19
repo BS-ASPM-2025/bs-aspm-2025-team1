@@ -14,7 +14,6 @@ on:
       - 'v*'
 
 jobs:
-
   build:
     name: build docker image
     runs-on: ubuntu-latest
