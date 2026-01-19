@@ -1,5 +1,5 @@
 #SQLAlchemy model for Job with additional fields and weights.
-from datetime import datetime
+"""from datetime import datetime
 from sqlalchemy import Column, Integer, Text, DateTime, Float
 from shared.database import Base
 
@@ -23,4 +23,4 @@ class Job(Base):
     experience_weight = Column(Float, default=1.0)
     weight_general = Column(Float, default=1.0)
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)"""

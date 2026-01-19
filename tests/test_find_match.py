@@ -7,7 +7,7 @@ This file is used to test the findMatch.py file
 import pytest
 from unittest.mock import MagicMock
 from src.findMatch import clean_text, calculate_tfidf_similarity, calculate_match_score
-from models.job import Job
+from src.models.job import Job
 
 class TestFindMatch:
     """
