@@ -14,10 +14,11 @@ on:
       - 'v*'
 
 jobs:
+
   build:
     name: build docker image
     runs-on: ubuntu-latest
-    # Only run if the CD pipeline succeeded and PR has 'release' in title
+    # Only run if the CD pipeline succeeded and PR has 'release' in the title
     if: |
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && 
        contains(github.event.workflow_run.head_commit.message, 'release')) ||
@@ -195,6 +196,7 @@ jobs:
           echo "\`docker pull ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Built from:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+
 
   deploy:
     name: deploy-to-azure
