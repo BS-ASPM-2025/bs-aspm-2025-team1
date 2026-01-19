@@ -1,6 +1,7 @@
 # IDE
 .idea/
 *.iml
+.vscode/
 
 # Python
 pycache/
@@ -15,7 +16,6 @@ venv/
 
 # Uploads / local DB artifacts
 uploads/
-*.db
 test_shared.db
 
 # OS

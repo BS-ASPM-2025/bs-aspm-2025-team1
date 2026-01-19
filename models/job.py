@@ -9,7 +9,7 @@ class Job(Base):
     id = Column(Integer, primary_key=True, index=True)
     job_text = Column(Text, nullable=False)
     id_text = Column(Text, nullable=False)
-    
+
     # New fields
     title = Column(Text, nullable=True)
     company = Column(Text, nullable=True)
