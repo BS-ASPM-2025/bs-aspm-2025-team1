@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: step-1
         uses: actions/checkout@v4.0.0
-      - name: step-2
-        uses: "docker://python:3.14"
       - name: step-3
         run: ls -alr
       - name: install-req
