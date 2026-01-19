@@ -78,5 +78,3 @@ def upgrade_head(db_url: str | None = None) -> None:
 
     if db_file:
         _dump_sqlite_state(db_file)
-if __name__ == "__main__":
-    upgrade_head()

@@ -4,20 +4,11 @@ Match model
 
 
 
-from datetime import datetime
 from sqlalchemy import Column, Integer, Text, Float, DateTime
+from datetime import datetime
 from shared.database import Base
 
 class Match(Base):
-
-    Match model to store resume-job match information.
-    Fields:
-    - id: Primary key
-    - resume_text: Text of the resume
-    - job_text: Text of the job description
-    - match_score: Calculated match score
-    - created_at: Timestamp of when the match was created
-
 
     __tablename__ = "match"
 

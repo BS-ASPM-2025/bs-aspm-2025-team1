@@ -89,5 +89,6 @@ def require_jobseeker_session(request: Request) -> int:
 
     return int(jobseeker_id)
 
+
 def logout(request: Request) -> None:
     request.session.clear()

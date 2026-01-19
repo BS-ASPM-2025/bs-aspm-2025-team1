@@ -1,5 +1,3 @@
-from bdb import Breakpoint
-
 from sqlalchemy.orm import Session
 
 from src.models import Company
@@ -13,7 +11,6 @@ class CompanyAuthService:
 
     def authenticate(self, db: Session, company_name: str, raw_password: str) -> Company | None:
         company = self.company_repo.get_by_name(db, company_name)
-
         if company is None:
             return None
 
