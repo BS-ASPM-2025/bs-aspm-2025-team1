@@ -103,7 +103,6 @@ jobs:
             
             📦 Built from commit: ${{ github.sha }}
             🌿 Branch: dev
-
           generate_release_notes: true
 
       - name: Add Docker Image to Summary
