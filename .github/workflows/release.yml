@@ -219,4 +219,4 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: "projectmanagement"
-          images: "${{ needs.release.outputs.version }}"
+          images: ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}
