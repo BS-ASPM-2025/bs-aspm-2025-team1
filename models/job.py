@@ -2,7 +2,7 @@
 
 SQLAlchemy model for Job with additional fields and weights.
 
-"""
+
 
 from datetime import datetime
 from sqlalchemy import Column, Integer, Text, DateTime, Float
@@ -10,7 +10,7 @@ from shared.database import Base
 
 
 class Job(Base):
-    """
+
     Job model to store job description information.
     Fields:
     - id: Primary key
@@ -26,7 +26,7 @@ class Job(Base):
     - experience_weight: Weight for experience matching
     - weight_general: General weight for overall matching
     - created_at: Timestamp of when the job was created
-    """
+
     __tablename__ = "jobs"
     id = Column(Integer, primary_key=True, index=True)
     job_text = Column(Text, nullable=False)
@@ -46,3 +46,4 @@ class Job(Base):
     weight_general = Column(Float, default=1.0)
 
     created_at = Column(DateTime, default=datetime.utcnow)
+"""
