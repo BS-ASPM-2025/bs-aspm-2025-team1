@@ -5,7 +5,6 @@ on:
     branches: ["dev"]
   workflow_dispatch:
 jobs:
-
   build:
     name: build docker image
     runs-on: ubuntu-latest
@@ -24,18 +23,38 @@ jobs:
         run: |
           SANITIZED_ACTOR=$(echo "${{ github.actor }}" | tr -d '[]')
           echo "sanitized_actor=$SANITIZED_ACTOR" >> "$GITHUB_OUTPUT"
+
+      - name: Generate Image Tag
+        id: image_tag
+        run: |
+          # Use commit SHA for unique identification
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          IMAGE_TAG="team1-${{ steps.actor_sanitize.outputs.sanitized_actor }}-${SHORT_SHA}-${{ github.run_number }}"
+          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+
       - name: build-image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ steps.actor_sanitize.outputs.sanitized_actor }}-${{ github.run_number }} .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.image_tag.outputs.image_tag }} .
+
       - name: push-image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ steps.actor_sanitize.outputs.sanitized_actor }}-${{ github.run_number }}
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.image_tag.outputs.image_tag }}
+
+      - name: Save image tag for release job
+        run: echo "${{ steps.image_tag.outputs.image_tag }}" > image_tag.txt
+
+      - name: Upload image tag artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-tag
+          path: image_tag.txt
 
   release:
     name: create release
     needs: [build]
     runs-on: ubuntu-latest
     if: |
-          github.event.pull_request.merged == true &&
-          contains(github.event.pull_request.title, 'release')
+          (github.event.pull_request.merged == true &&
+          contains(github.event.pull_request.title, 'release')) ||
+          startsWith(github.ref, 'refs/tags/v')
     outputs:
       version: ${{ steps.extract_version.outputs.VERSION }}
     permissions:
@@ -43,34 +62,58 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-            fetch-depth: 0
-            ref: dev
+          ref: dev
+          fetch-depth: 0
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Download image tag artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: image-tag
+
+      - name: Read image tag
+        id: read_tag
+        run: |
+          IMAGE_TAG=$(cat image_tag.txt)
+          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+
       - name: Extract Version
         id: extract_version
         uses: actions/github-script@v7
         with:
           script: |
-            const msg = context.payload.pull_request.title || '';
-            console.log('Commit message:', msg);
-            const match = msg.match(/release\s+(v\d+\.\d+\.\d+)/);
-            if (!match) {
-              core.setFailed('No release version found in commit message');
+            let version = '';
+            
+            // Check if triggered by tag push
+            if (context.ref && context.ref.startsWith('refs/tags/v')) {
+              version = context.ref.replace('refs/tags/', '');
+              console.log('Version from tag:', version);
+            } 
+            // Check if triggered by PR with release in title
+            else if (context.payload.pull_request) {
+              const msg = context.payload.pull_request.title || '';
+              console.log('PR title:', msg);
+              const match = msg.match(/release\s+(v\d+\.\d+\.\d+)/i);
+              if (match) {
+                version = match[1];
+                console.log('Version from PR title:', version);
+              }
+            }
+            
+            if (!version) {
+              core.setFailed('No release version found');
               return;
             }
-            core.setOutput('VERSION', match[1]);
-      - name: Sanitize Actor
-        id: actor_sanitize
-        run: |
-          SANITIZED_ACTOR=$(echo "${{ github.actor }}" | tr -d '[]')
-          echo "sanitized_actor=$SANITIZED_ACTOR" >> "$GITHUB_OUTPUT"
+            
+            core.setOutput('VERSION', version);
 
-      - name: Check if tag already exists
+      - name: Check if tag already exists (only for PR workflow)
+        if: github.event_name == 'pull_request'
         run: |
           git fetch --tags
           if git rev-parse "${{ steps.extract_version.outputs.VERSION }}" >/dev/null 2>&1; then
@@ -78,11 +121,21 @@ jobs:
             exit 1
           fi
 
+      - name: Create and Push Tag
+        if: github.event_name == 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a ${{ steps.extract_version.outputs.VERSION }} -m "Release ${{ steps.extract_version.outputs.VERSION }}"
+          git push origin ${{ steps.extract_version.outputs.VERSION }}
+
       - name: Pull Docker Image
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ steps.actor_sanitize.outputs.sanitized_actor }}-${{ github.run_number }}
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.read_tag.outputs.image_tag }}
+
       - name: Tag Release Image
         if: steps.extract_version.outputs.VERSION != ''
-        run: docker tag ${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ steps.actor_sanitize.outputs.sanitized_actor }}-${{ github.run_number }} ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}
+        run: docker tag ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.read_tag.outputs.image_tag }} ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}
+
       - name: Push Release Image
         if: steps.extract_version.outputs.VERSION != ''
         run: docker push ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}
