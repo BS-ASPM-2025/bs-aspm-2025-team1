@@ -7,10 +7,10 @@ from sqlalchemy.orm import Session
 
 from shared import get_db
 from src.repositories.company_repository import CompanyRepository
-
+from src.repositories.jobseeker_repository import JobSeekerRepository
 
 from src.security.auth.company_auth_service import CompanyAuthService
-
+from src.security.auth.jobseeker_auth_service import JobSeekerAuthService
 
 from src.security.session import start_company_session, logout
 from src.security.session import start_jobseeker_session
@@ -22,6 +22,8 @@ templates = Jinja2Templates(directory="templates")
 _company_repo = CompanyRepository()
 _company_auth_service = CompanyAuthService(_company_repo)
 
+_jobseeker_repo = JobSeekerRepository()
+_jobseeker_auth_service = JobSeekerAuthService(_jobseeker_repo)
 
 
 @router.get("/company/login", include_in_schema=False)
@@ -87,6 +89,24 @@ def auth_company(
     start_company_session(request, company_id=company.id)
 
     return RedirectResponse(url="/jobs/manage", status_code=303)
+
+
+@router.post("/auth/jobseeker", include_in_schema=False)
+def auth_jobseeker(
+    request: Request,
+    email: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    email = email.strip()
+
+    jobseeker = _jobseeker_auth_service.authenticate(db, email, password)
+    if not jobseeker:
+        return RedirectResponse(url="/jobseeker/login?err=invalid_credentials", status_code=303)
+
+    start_jobseeker_session(request, jobseeker_id=jobseeker.id)
+
+    return RedirectResponse(url="/resumes/manage", status_code=303)
 
 
 
