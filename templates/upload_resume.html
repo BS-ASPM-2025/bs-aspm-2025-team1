@@ -2,232 +2,343 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Resume</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-color: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-color: #111827;
-            --text-secondary: #225ed5;
-            --border-color: #e5e7eb;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Resume</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        .upload-card {
-            background-color: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-        }
-
-        h1 {
-            margin-top: 0;
-            font-weight: 600;
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        p.subtitle {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-bottom: 2rem;
-        }
-
-        .drop-zone {
-            border: 2px dashed var(--border-color);
-            border-radius: 0.75rem;
-            padding: 2rem 1.5rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .drop-zone:hover,
-        .drop-zone.dragover {
-            border-color: var(--primary-color);
-            background-color: #eef2ff;
-        }
-
-        .drop-zone input[type="file"] {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .icon-container {
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-        }
-
-        .icon-container svg {
-            width: 48px;
-            height: 48px;
-        }
-
-        .drop-text {
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .drop-subtext {
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-        }
-
-        #file-name {
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-            display: none;
-        }
-
-        .btn-upload {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            width: 100%;
-            margin-top: 1.5rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            font-size: 1rem;
-        }
-
-        .btn-upload:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .error-alert {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-            border: 1px solid #fecaca;
-        }
-
-        .success-alert {
-        background-color: #dcfce7;
-        color: #166534;
-        padding: 0.75rem 1rem;
-        border-radius: 0.5rem;
-        border: 1px solid #bbf7d0;
-        margin: 1rem 0 1.5rem;
-        font-weight: 600;
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-color: #111827;
+      --text-secondary: #6b7280;
+      --border-color: #e5e7eb;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
     }
-    </style>
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1.5rem;
+    }
+
+    .upload-card {
+      background-color: var(--card-bg);
+      padding: 2.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 520px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 0;
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 1.75rem;
+      line-height: 1.5;
+    }
+
+    .error-alert {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+      border: 1px solid #fecaca;
+      text-align: left;
+    }
+
+    .field {
+      text-align: left;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+
+    input[type="text"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.85rem 0.9rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-color);
+      outline: none;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+    }
+
+    .help {
+      margin-top: 0.35rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border-color);
+      border-radius: 0.75rem;
+      padding: 2rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      text-align: center;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.dragover {
+      border-color: var(--primary-color);
+      background-color: #eef2ff;
+    }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .icon-container {
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+    }
+
+    .icon-container svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    .drop-text {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .drop-subtext {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    #file-name {
+      margin-top: 0.9rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      display: none;
+      text-align: left;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      flex: 1;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid transparent;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.12s, background-color 0.2s, border-color 0.2s;
+      font-size: 1rem;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: translateY(1px); }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background-color: var(--primary-hover); }
+
+    .btn-secondary {
+      background-color: #fff;
+      color: var(--text-color);
+      border-color: var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary-color);
+    }
+
+    @media (max-width: 520px) {
+      .btn { flex: 1 1 100%; }
+    }
+  </style>
 </head>
 
 <body>
 
-    <div class="upload-card">
-        <h1>Upload Your Resume</h1>
-        <p class="subtitle">Please upload your resume in PDF format</p>
+  <div class="upload-card">
+    <h1>Upload Your Resume</h1>
+    <p class="subtitle">
+      Add a title and upload a file. We will extract and store resume text for matching.
+      <br />
+      Supported: PDF / TXT (DOCX optional).
+    </p>
 
-        {% if error %}
-        <div class="error-alert">
-            {{ error }}
+    {% if error %}
+      <div class="error-alert">{{ error }}</div>
+    {% endif %}
+
+    <!-- IMPORTANT: action matches your controller: POST /resumes/upload -->
+    <form
+      action="/resumes/upload"
+      method="post"
+      enctype="multipart/form-data"
+      onsubmit="return confirm('Upload this resume now?');"
+      autocomplete="off"
+    >
+      <!-- Title -->
+      <div class="field">
+        <label for="title">Resume Title</label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          placeholder="e.g., Backend Developer CV (Jan 2026)"
+          maxlength="120"
+          required
+        />
+        <div class="help">
+          This title will be shown in the Resume Management list.
         </div>
-        {% endif %}
+      </div>
 
-        <form action="/upload_resume" method="post" enctype="multipart/form-data">
-            <div class="drop-zone" id="drop-zone">
-                <div class="icon-container">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                        </path>
-                    </svg>
-                </div>
-                <div class="drop-text">Click or Drag & Drop to Upload</div>
-                <div class="drop-subtext">PDF files only (max 5MB)</div>
-                <input type="file" name="file" id="file-input" accept=".pdf" required>
-            </div>
-            <div id="file-name"></div>
-            <button type="submit" class="btn-upload">Upload Resume</button>
-        </form>
-    </div>
+      <!-- File -->
+      <div class="field">
+        <label for="file-input">Resume File</label>
 
-    <script>
-        const fileInput = document.getElementById('file-input');
-        const fileNameDisplay = document.getElementById('file-name');
-        const dropZone = document.getElementById('drop-zone');
+        <div class="drop-zone" id="drop-zone">
+          <div class="icon-container">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+              </path>
+            </svg>
+          </div>
 
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                const fileName = e.target.files[0].name;
-                fileNameDisplay.textContent = `Selected: ${fileName}`;
-                fileNameDisplay.style.display = 'block';
-                dropZone.style.borderColor = '#4f46e5';
-                dropZone.style.backgroundColor = '#eef2ff';
-            }
-        });
+          <div class="drop-text">Click or Drag & Drop to Upload</div>
+          <div class="drop-subtext">PDF / TXT (DOCX optional)</div>
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
-        });
+          <!-- accept is UI-only; backend should still validate -->
+          <input
+            type="file"
+            name="file"
+            id="file-input"
+            accept=".pdf,.txt,.docx"
+            required
+          />
+        </div>
 
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
+        <div id="file-name"></div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="btn-row">
+        <button type="submit" class="btn btn-primary">Upload Resume</button>
+
+        <a
+          class="btn btn-secondary"
+          href="/resumes/manage"
+          onclick="return confirm('Discard changes and return to Resume Management?');"
+        >
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('file-input');
+    const fileNameDisplay = document.getElementById('file-name');
+    const dropZone = document.getElementById('drop-zone');
+    const titleInput = document.getElementById('title');
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        fileNameDisplay.textContent = `Selected: ${file.name}`;
+        fileNameDisplay.style.display = 'block';
+        dropZone.style.borderColor = '#4f46e5';
+        dropZone.style.backgroundColor = '#eef2ff';
+
+        // Optional UX: if title is empty, auto-fill with file name (without extension)
+        if (!titleInput.value.trim()) {
+          const base = file.name.replace(/\.[^/.]+$/, "");
+          titleInput.value = base;
         }
+      }
+    });
 
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, highlight, false);
-        });
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+    });
 
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, unhighlight, false);
-        });
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
-        function highlight(e) {
-            dropZone.classList.add('dragover');
-        }
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+    });
 
-        function unhighlight(e) {
-            dropZone.classList.remove('dragover');
-        }
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+    });
 
-        dropZone.addEventListener('drop', handleDrop, false);
+    dropZone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      fileInput.files = files;
 
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            fileInput.files = files;
-
-            // Trigger change event manually
-            const event = new Event('change');
-            fileInput.dispatchEvent(event);
-        }
-    </script>
+      // Trigger change event manually
+      const event = new Event('change');
+      fileInput.dispatchEvent(event);
+    }, false);
+  </script>
 
 </body>
-
-
 </html>

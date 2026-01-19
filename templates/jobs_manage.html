@@ -282,6 +282,71 @@
       transform: translateY(1px);
     }
 
+    .pill-open {
+      border-color: #bbf7d0;
+      background: var(--success-bg);
+      color: var(--success-text);
+    }
+
+    .pill-closed {
+      border-color: #fecaca;
+      background: var(--error-bg);
+      color: var(--error-text);
+    }
+
+    .kv {
+      margin: 0.75rem 0 0;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-color);
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 0.35rem 0.75rem;
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+
+    .kv .k {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .kv .v {
+      color: var(--text-color);
+      word-break: break-word;
+    }
+
+    .weights {
+      margin-top: 0.9rem;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 0.75rem;
+    }
+
+    .weights-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      margin: 0 0 0.5rem 0;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .weights-grid {
+      display: grid;
+      grid-template-columns: 1fr 90px;
+      gap: 0.35rem 0.75rem;
+      font-size: 0.92rem;
+    }
+
+    .weights-grid .k {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .weights-grid .v {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
   </style>
 </head>
 
@@ -349,7 +414,8 @@
           <div class="card">
             <div class="card-top">
               <div>
-                <h3 class="job-title">{{ j.title }}</h3>
+                <h3 class="job-title">{{ j.title or "(untitled)" }}</h3>
+
                 <p class="meta">
                   ID: {{ j.id }}
                   {% if j.created_at %}
@@ -358,7 +424,39 @@
                 </p>
               </div>
 
-              <div class="pill">Active</div>
+              {% if j.is_open == 1 %}
+                <div class="pill pill-open">Active</div>
+              {% else %}
+                <div class="pill pill-closed">Closed</div>
+              {% endif %}
+            </div>
+
+            <div class="kv">
+              <div class="k">Required skills</div>
+              <div class="v">{{ j.required_skills or "-" }}</div>
+
+              <div class="k">Degree</div>
+              <div class="v">{{ j.degree or "-" }}</div>
+
+              <div class="k">Experience</div>
+              <div class="v">{{ j.experience or "-" }}</div>
+            </div>
+
+            <div class="weights">
+              <p class="weights-title">Weights</p>
+              <div class="weights-grid">
+                <div class="k">Skills</div>
+                <div class="v">{{ "%.2f"|format(j.skills_weight or 1.0) }}</div>
+
+                <div class="k">Degree</div>
+                <div class="v">{{ "%.2f"|format(j.degree_weight or 1.0) }}</div>
+
+                <div class="k">Experience</div>
+                <div class="v">{{ "%.2f"|format(j.experience_weight or 1.0) }}</div>
+
+                <div class="k">General</div>
+                <div class="v">{{ "%.2f"|format(j.weight_general or 1.0) }}</div>
+              </div>
             </div>
 
             <div class="card-actions">

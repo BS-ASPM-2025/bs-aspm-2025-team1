@@ -1,17 +1,12 @@
-import uuid
-from typing import List, Dict, Any, Optional
+from typing import List, Optional
 from sqlalchemy.orm import Session
 
-from models import Job
-from src.repositories.company_repository import CompanyRepository
+from src.models import Job
 from src.repositories.job_repository import JobRepository
 
-
 class JobService:
-    def __init__(self, _job_repo: JobRepository, _company_repo: CompanyRepository):
-        self._job_repo = _job_repo
-        self._company_repo = _company_repo
-
+    def __init__(self, job_repo: JobRepository):
+        self._job_repo = job_repo
 
     def create_offer(
         self,
@@ -28,10 +23,6 @@ class JobService:
         experience_weight: float = 1.0,
         weight_general: float = 1.0,
     ) -> Job:
-        company_name = self._company_repo.get_name_by_id(db, company_id)
-        if not company_name:
-            raise ValueError(f"Company with id={company_id} not found")
-
         combined_text = (
             f"Title: {title}\n"
             f"Skills: {required_skills}\n"
@@ -41,10 +32,9 @@ class JobService:
         )
 
         new_job = Job(
-            id_text=str(uuid.uuid4()),
-            job_text=combined_text,
+            company_id=int(company_id),
+            raw_text=combined_text,
             title=title,
-            company=company_name,
             required_skills=required_skills,
             degree=degree,
             experience=experience,
@@ -53,70 +43,37 @@ class JobService:
             experience_weight=float(experience_weight),
             weight_general=float(weight_general),
         )
-
         return self._job_repo.create(db, new_job)
+
+    def list_jobs_for_company(self, db: Session, company_id: int) -> List[Job]:
+        return self._job_repo.find_by_company_id(db, company_id)
 
     def get_offer_for_company(self, db: Session, *, company_id: int, job_id: int) -> Job:
         job = self._job_repo.get_by_id(db, job_id)
         if not job:
             raise ValueError("Job offer not found")
-
-        company_name = self._company_repo.get_name_by_id(db, company_id)
-        if not company_name:
-            raise ValueError("Company not found")
-
-        if (job.company or "").strip() != company_name.strip():
+        if int(job.company_id) != int(company_id):
             raise PermissionError("Job offer does not belong to this company")
-
         return job
 
-
-    def list_job_summaries_for_company(self, db: Session, company_id: int) -> List[Dict[str, Any]]:
-        company_name = self._company_repo.get_name_by_id(db, company_id)
-        if not company_name:
-            return []
-
-        jobs = self._job_repo.find_by_company_name(db, company_name)
-
-        return [
-            {
-                "id": j.id,
-                "title": j.title or "(untitled)",
-                "created_at": j.created_at,
-            }
-            for j in jobs
-        ]
-
-
     def update_offer(
-            self,
-            db: Session,
-            *,
-            company_id: int,
-            job_id: int,
-            title: Optional[str] = None,
-            degree: Optional[str] = None,
-            experience: Optional[str] = None,
-            required_skills: Optional[str] = None,
-            job_text: Optional[str] = None,
-            skills_weight: Optional[float] = None,
-            degree_weight: Optional[float] = None,
-            experience_weight: Optional[float] = None,
-            weight_general: Optional[float] = None,
+        self,
+        db: Session,
+        *,
+        company_id: int,
+        job_id: int,
+        title: Optional[str] = None,
+        degree: Optional[str] = None,
+        experience: Optional[str] = None,
+        required_skills: Optional[str] = None,
+        job_text: Optional[str] = None,
+        skills_weight: Optional[float] = None,
+        degree_weight: Optional[float] = None,
+        experience_weight: Optional[float] = None,
+        weight_general: Optional[float] = None,
     ) -> Job:
-        job = self._job_repo.get_by_id(db, job_id)
-        # Security layer
-        if not job:
-            raise ValueError("Job offer not found")
+        job = self.get_offer_for_company(db, company_id=company_id, job_id=job_id)
 
-        company_name = self._company_repo.get_name_by_id(db, company_id)
-        if not company_name:
-            raise ValueError("Company not found")
-
-        if job.company != company_name:
-            raise ValueError("Job offer does not belong to this company")
-
-        # Update layer
         if title is not None:
             job.title = title
         if degree is not None:
@@ -143,22 +100,12 @@ class JobService:
                 f"Experience: {job.experience or ''}\n\n"
                 f"Description:\n{job_text}"
             )
-            job.job_text = combined_text
+            job.raw_text = combined_text
 
         db.commit()
         db.refresh(job)
         return job
 
     def delete_offer(self, db: Session, *, company_id: int, job_id: int) -> None:
-        job = self._job_repo.get_by_id(db, job_id)
-        if not job:
-            raise ValueError("Job offer does not exist")
-
-        company_name = self._company_repo.get_name_by_id(db, company_id)
-        if not company_name:
-            raise ValueError("Company does not exist")
-
-        if (job.company or "").strip() != company_name.strip():
-            raise PermissionError("Job offer does not belong to this company")
-
+        job = self.get_offer_for_company(db, company_id=company_id, job_id=job_id)
         self._job_repo.delete(db, job)

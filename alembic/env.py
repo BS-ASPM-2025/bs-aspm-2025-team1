@@ -21,8 +21,7 @@ target_metadata = Base.metadata
 
 
 def get_database_url() -> str:
-    # 2) get DATABASE_URL from env, or default
-    return os.getenv("DATABASE_URL", "sqlite:///./my_database.db")
+    return config.get_main_option("sqlalchemy.url") or os.getenv("DATABASE_URL", "sqlite:///./my_database.db")
 
 
 def run_migrations_offline() -> None:
@@ -42,9 +41,9 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode."""
+    url = get_database_url()
     configuration = config.get_section(config.config_ini_section) or {}
-    configuration["sqlalchemy.url"] = get_database_url()
+    configuration["sqlalchemy.url"] = url
 
     connectable = engine_from_config(
         configuration,
@@ -57,7 +56,7 @@ def run_migrations_online() -> None:
             connection=connection,
             target_metadata=target_metadata,
             compare_type=True,
-            render_as_batch=get_database_url().startswith("sqlite"),
+            render_as_batch=url.startswith("sqlite"),
         )
 
         with context.begin_transaction():

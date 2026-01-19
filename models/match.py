@@ -2,7 +2,7 @@
 
 Match model
 
-"""
+
 
 from sqlalchemy import Column, Integer, Text, Float, DateTime
 from datetime import datetime
@@ -17,3 +17,4 @@ class Match(Base):
     job_text = Column(Text, nullable=False)
     match_score = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+"""

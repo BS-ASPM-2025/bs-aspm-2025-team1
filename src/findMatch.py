@@ -1,7 +1,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import re
-from models.job import Job
+from src.models.job import Job
 
 def clean_text(text: str) -> str:
     """Simple text cleaning"""

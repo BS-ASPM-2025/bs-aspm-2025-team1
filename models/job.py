@@ -1,4 +1,4 @@
-
+"""
 from sqlalchemy import Column, Integer, Text, DateTime, Float
 from datetime import datetime
 from shared.database import Base
@@ -24,3 +24,4 @@ class Job(Base):
     weight_general = Column(Float, default=1.0)
 
     created_at = Column(DateTime, default=datetime.utcnow)
+"""

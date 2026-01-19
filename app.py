@@ -1,21 +1,25 @@
 import os
 import shutil
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, Depends, Form, File, UploadFile
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+from shared.alembic_runner import upgrade_head
 from starlette.middleware import Middleware
 from starlette.status import HTTP_302_FOUND
 from starlette.middleware.sessions import SessionMiddleware
 
-from shared import get_db, engine, Base
-from models import Resume, Job
-import uuid
+from shared import get_db
+from src.models import Resume
 
 from src.handlepdf import extract_text_from_pdf
 from src.web.auth_controller import router as auth_router
 from src.web.job_controller import router as job_router
+from src.web.resume_controller import router as resume_router
+
+logger = logging.getLogger("startup")
 
 templates = Jinja2Templates(directory="templates")
 
@@ -25,7 +29,9 @@ SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "1800"))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
+    logger.warning("LIFESPAN: running Alembic upgrade_head() ...")
+    upgrade_head()
+    logger.warning("LIFESPAN: migrations done.")
     yield
 
 middleware = [
@@ -41,6 +47,7 @@ middleware = [
 app = FastAPI(title="Resume–Job Matcher", lifespan=lifespan, middleware=middleware)
 app.include_router(auth_router)
 app.include_router(job_router)
+app.include_router(resume_router)
 @app.get("/")
 async def root(request: Request):
     return templates.TemplateResponse(
@@ -98,8 +105,8 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
         text = "" # Placeholder for DOC/DOCX extraction later
 
     resume_test = Resume(
-        resume_text=text,
-        id_text=file.filename
+        raw_text=text,
+        source_id_text=file.filename
     )
     db.add(resume_test)
     db.commit()

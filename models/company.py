@@ -2,7 +2,7 @@
 Company model
 
 Represents a company account used for organization authentication.
-"""
+
 
 from sqlalchemy import Column, Integer, Text, DateTime
 from datetime import datetime
@@ -21,3 +21,4 @@ class Company(Base):
     password = Column(Text, nullable=False)
 
     created_at = Column(DateTime, default=datetime.utcnow)
+"""
