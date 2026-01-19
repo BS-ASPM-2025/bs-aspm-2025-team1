@@ -100,9 +100,14 @@ jobs:
             ```
             docker pull ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}
             ```
+            
+            📦 Built from commit: ${{ github.sha }}
+            🌿 Branch: dev
           generate_release_notes: true
 
       - name: Add Docker Image to Summary
         run: |
           echo "## 🐳 Docker Image" >> $GITHUB_STEP_SUMMARY
           echo "\`docker pull ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Built from:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
