@@ -198,6 +198,8 @@ jobs:
           echo "**Built from:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
 
 
+  
+
   deploy:
     name: deploy-to-azure
     needs: [ build, release ]
@@ -219,4 +221,4 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: "projectmanagement"
-          images: ${{ secrets.DOCKER_USERNAME }}/aspm:${{ steps.extract_version.outputs.VERSION }}
+          images: ${{ secrets.DOCKER_USERNAME }}/aspm:${{ needs.release.outputs.version }}
