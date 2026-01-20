@@ -13,7 +13,14 @@ from src.security.auth.company_auth_service import CompanyAuthService
 from src.security.auth.jobseeker_auth_service import JobSeekerAuthService
 
 from src.security.session import start_company_session, logout
-from src.security.session import start_jobseeker_session
+import os
+from fastapi.templating import Jinja2Templates
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+
+#from src.security.session import start_jobseeker_session
+
 
 router = APIRouter()
 
@@ -21,6 +28,7 @@ templates = Jinja2Templates(directory="templates")
 
 _company_repo = CompanyRepository()
 _company_auth_service = CompanyAuthService(_company_repo)
+
 
 _jobseeker_repo = JobSeekerRepository()
 _jobseeker_auth_service = JobSeekerAuthService(_jobseeker_repo)

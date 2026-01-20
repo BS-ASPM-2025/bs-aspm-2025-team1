@@ -3,8 +3,12 @@
 Tests for navigation between different pages of the FastAPI application.
 
 """
+from src.web.auth_controller import templates
+
+
 import pytest
 @pytest.mark.skip(reason="outdated after migrations refactor")
+
 def test_index_loads(client):
     """
     Tests that the index page loads successfully.
@@ -46,6 +50,7 @@ def test_post_job_get_requires_company_session(client):
 @pytest.mark.skip(reason="outdated after migrations refactor")
 def test_company_login_get_loads(client):
     r = client.get("/company/login")
+    print("TEMPLATES SEARCHPATH:", templates.env.loader.searchpath)
     assert r.status_code == 200
 
 @pytest.mark.skip(reason="outdated after migrations refactor")

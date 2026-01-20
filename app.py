@@ -17,11 +17,18 @@ from src.models import Resume
 from src.handlepdf import extract_text_from_pdf
 from src.web.auth_controller import router as auth_router
 from src.web.job_controller import router as job_router
+
+from src.web.templates_config import templates
+
+from typing import Generator
 from src.web.resume_controller import router as resume_router
 
 logger = logging.getLogger("startup")
 
-templates = Jinja2Templates(directory="templates")
+#templates = Jinja2Templates(directory="templates")
+
+#BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+#templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 APP_NAME = os.getenv("APP_NAME", "ResuMe")
 SESSION_SECRET = os.getenv("SESSION_SECRET", "dev-change-me")
