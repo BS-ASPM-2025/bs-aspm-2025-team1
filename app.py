@@ -8,16 +8,14 @@ Sets up FastAPI app, routes, and middleware.
 import os
 import shutil
 from contextlib import asynccontextmanager
-from passlib.context import CryptContext
 import sqlite3
-from fastapi import FastAPI, Request, Depends, Form, File, UploadFile, HTTPException
+from fastapi import FastAPI, Request, Depends, Form, File, UploadFile
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from starlette.middleware import Middleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import HTMLResponse
-
 from shared import get_db, engine, Base
 from models import Resume, Job, Match, Company
 from src.handlepdf import extract_text_from_pdf
@@ -165,8 +163,10 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
             "score": score
         })
     db.commit()
+    # sort results by score descending
+    results.sort(key=lambda x: x["score"], reverse=True)
 
-    # Store results in session for display
+    # Store results in the session for display
     request.session["match_results"] = results
 
     return RedirectResponse(url="/resume_upload_feedback", status_code=303)
@@ -190,9 +190,6 @@ async def resume_upload_feedback_page(request: Request):
         }
     )
 
-#@app.post("/resume_upload_feedback", include_in_schema=False)
-#async def resume_upload_feedback_return(password: str = Form(...)):
-#    return RedirectResponse(url="/", status_code=303)
 
 #--------------------------------------------------------------
 @app.get("/passcode", include_in_schema=False)
@@ -209,20 +206,6 @@ async def passcode_submit(password: str = Form(...)):
 
 if __name__ == '__main__':
     import uvicorn
-
-    # pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    # db = next(get_db())
-    # from models.company import Company
-    #
-    # demo_company = Company(
-    #     company_name="Demo",
-    #     password= pwd_context.hash("Demo1234")
-    # )
-    #
-    # # Add and commit to the database
-    # db.add(demo_company)
-    # db.commit()
-    # db.refresh(demo_company)
     uvicorn.run("app:app", port=8000,host='0.0.0.0', reload=False, workers=4)
 
 #--------------------------------------------------------------
