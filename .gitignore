@@ -1,0 +1,24 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Python
+pycache/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual env
+.venv/
+venv/
+
+# Uploads / local DB artifacts
+uploads/
+*.db
+test_shared.db
+
+# OS
+.DS_Store
+Thumbs.db

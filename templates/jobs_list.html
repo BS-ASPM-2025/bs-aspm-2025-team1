@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HR Job List - {{ company_name }}</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-color: #f9fafb;
+      --card-bg: #ffffff;
+      --text-color: #111827;
+      --text-secondary: #6b7280;
+      --border-color: #e5e7eb;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      margin-left: 2rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--text-color);
+    }
+
+    main {
+      flex: 1;
+      padding: 2.5rem 1rem 3.5rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    .page-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .page-title {
+      margin: 0;
+      font-size: 1.75rem;
+    }
+
+    .page-subtitle {
+      margin: 0.25rem 0 0;
+      color: var(--text-secondary);
+    }
+
+    .count-pill {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 0.75rem;
+      border-radius: 999px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .job-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
+      padding: 1.25rem 1.25rem 1rem;
+    }
+
+    .job-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .job-title {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .meta {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .badge {
+      font-size: 0.85rem;
+      padding: 0.35rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+      background: #fff;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem 1rem;
+      margin: 0.75rem 0 0.5rem;
+    }
+
+    .kv {
+      border: 1px solid var(--border-color);
+      background: #fff;
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+    }
+
+    .k {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .v {
+      font-weight: 600;
+      color: var(--text-color);
+      line-height: 1.35;
+      white-space: pre-wrap;
+    }
+
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .chip {
+      background: #eef2ff;
+      color: #3730a3;
+      border: 1px solid #e0e7ff;
+      padding: 0.3rem 0.6rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .desc {
+      margin-top: 0.75rem;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 0.75rem;
+    }
+
+    .empty {
+      background: var(--card-bg);
+      border: 1px dashed var(--border-color);
+      border-radius: 1rem;
+      padding: 2rem;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .grid { grid-template-columns: 1fr; }
+      header { padding: 1rem 1.25rem; }
+      .page-head { flex-direction: column; align-items: flex-start; }
+      .meta { justify-content: flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="/" class="logo">{{ company_name }}</a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/upload_resume">Resume</a>
+      <a href="/post_job">Post Job</a>
+      <a href="/hr_job_list">HR Job List</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">Jobs List</h1>
+          <p class="page-subtitle">Full report of all jobs currently in the system.</p>
+        </div>
+        <div class="count-pill">
+          Total jobs: {{ jobs|length if jobs else 0 }}
+        </div>
+      </div>
+
+      {% if not jobs or jobs|length == 0 %}
+        <div class="empty">
+          <h2 style="margin:0 0 0.5rem;">No jobs found</h2>
+          <div>Once you post jobs, they’ll appear here as a report.</div>
+        </div>
+      {% else %}
+        <div class="list">
+          {% for j in jobs %}
+          <div class="job-card">
+            <div class="job-top">
+              <div>
+                <h2 class="job-title">{{ j.title }}</h2>
+              </div>
+
+              <div class="meta">
+                <span class="badge">Degree: {{ j.degree }}</span>
+                <span class="badge">Experience: {{ j.experience }} yrs</span>
+              </div>
+            </div>
+
+            <div class="grid">
+              <div class="kv">
+                <span class="k">Degree Weight</span>
+                <span class="v">{{ j.degree_weight }}</span>
+              </div>
+              <div class="kv">
+                <span class="k">Experience Weight</span>
+                <span class="v">{{ j.experience_weight }}</span>
+              </div>
+              <div class="kv">
+                <span class="k">Skills Weight</span>
+                <span class="v">{{ j.skills_weight }}</span>
+              </div>
+              <div class="kv">
+                <span class="k">Required Skills</span>
+                <span class="v">{{ j.required_skills }}</span>
+
+                <div class="skills">
+                  {% for s in (j.required_skills or '').split(',') %}
+                    {% set ss = s.strip() %}
+                    {% if ss %}
+                      <span class="chip">{{ ss }}</span>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <div class="desc">
+              <span class="k">Job Description</span>
+              <div class="v">{{ j.job_text }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </main>
+</body>
+
+</html>

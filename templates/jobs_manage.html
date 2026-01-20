@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ company_name }} — Job Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-color: #f9fafb;
+      --card-bg: #ffffff;
+      --text-color: #111827;
+      --text-secondary: #6b7280;
+      --border-color: #e5e7eb;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --error-bg: #fee2e2;
+      --error-text: #b91c1c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      margin-left: 2rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--text-color);
+    }
+
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+    }
+
+    .page-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .title-block h1 {
+      margin: 0 0 0.35rem 0;
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .title-block p {
+      margin: 0;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 720px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border: 1px solid transparent;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s, background-color 0.2s, border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: translateY(1px); }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background-color: var(--primary-hover); }
+
+    .btn-secondary {
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      border-color: var(--border-color);
+    }
+
+    .btn-secondary:hover { border-color: var(--primary-color); }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: #fff;
+    }
+
+    .btn-danger:hover { background-color: var(--danger-hover); }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      background: #fff;
+    }
+
+    .alert {
+      border-radius: 0.75rem;
+      padding: 0.85rem 1rem;
+      border: 1px solid;
+      margin: 1rem 0 1.5rem;
+      text-align: left;
+    }
+
+    .alert-success {
+      background: var(--success-bg);
+      border-color: #bbf7d0;
+      color: var(--success-text);
+    }
+
+    .alert-error {
+      background: var(--error-bg);
+      border-color: #fecaca;
+      color: var(--error-text);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.25rem;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.10), 0 4px 6px -2px rgba(0, 0, 0, 0.06);
+      border-color: var(--primary-color);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+    }
+
+    .job-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .meta {
+      margin: 0.5rem 0 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-small {
+      padding: 0.55rem 0.8rem;
+      border-radius: 0.7rem;
+      font-size: 0.9rem;
+    }
+
+    .empty {
+      margin-top: 1.25rem;
+      background: var(--card-bg);
+      border: 1px dashed var(--border-color);
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      border-top: 1px solid var(--border-color);
+      background: #fff;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    nav a {
+      margin-left: 0;
+    }
+
+    .logout-form {
+      margin-left: auto;
+    }
+
+    .logout-btn {
+      background-color: var(--primary-color);
+      color: #fff;
+      border: 1px solid transparent;
+      border-radius: 0.75rem;
+      padding: 0.65rem 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.15s;
+      white-space: nowrap;
+    }
+
+    .logout-btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .logout-btn:active {
+      transform: translateY(1px);
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <a href="/" class="logo">{{ company_name }}</a>
+
+    <nav>
+      <a href="/">Home</a>
+      <a href="/upload_resume">Resume</a>
+      <a href="/jobs/manage">Jobs</a>
+      <a href="#">Contact</a>
+
+      <form
+        class="logout-form"
+        action="/logout"
+        method="post"
+        onsubmit="return confirm('Logout now?');"
+      >
+        <button type="submit" class="logout-btn">Logout</button>
+      </form>
+    </nav>
+
+  </header>
+
+  <main>
+    <div class="page-head">
+      <div class="title-block">
+        <h1>Job Management</h1>
+        <p>
+          View and manage job offers posted by your organization. You can add a new offer, or update/delete existing ones.
+        </p>
+      </div>
+
+      <div class="actions">
+        <a class="btn btn-secondary" href="/post_job">+ Add new job</a>
+      </div>
+    </div>
+
+    {# Optional alerts: pass success/error via context when needed #}
+    {% if success %}
+      <div class="alert alert-success">Job offer created successfully.</div>
+    {% endif %}
+
+    {% if updated %}
+      <div class="alert alert-success">Job offer updated successfully.</div>
+    {% endif %}
+
+    {% if deleted %}
+      <div class="alert alert-success">Job offer deleted successfully.</div>
+    {% endif %}
+
+    {% if error %}
+      <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+
+    {% if jobs and jobs|length > 0 %}
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
+        <div class="pill">{{ jobs|length }} offer(s)</div>
+      </div>
+
+      <div class="grid">
+        {% for j in jobs %}
+          <div class="card">
+            <div class="card-top">
+              <div>
+                <h3 class="job-title">{{ j.title }}</h3>
+                <p class="meta">
+                  ID: {{ j.id }}
+                  {% if j.created_at %}
+                    <br />Created: {{ j.created_at }}
+                  {% endif %}
+                </p>
+              </div>
+
+              <div class="pill">Active</div>
+            </div>
+
+            <div class="card-actions">
+              <a class="btn btn-secondary btn-small" href="/jobs/{{ j.id }}/edit">Update</a>
+
+              <form
+                action="/jobs/{{ j.id }}/delete"
+                method="post"
+                style="margin:0;"
+                onsubmit="return confirm('Delete this job offer? This action cannot be undone.');"
+              >
+                <button type="submit" class="btn btn-danger btn-small">Delete</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty">
+        <h3 style="margin:0 0 0.5rem 0; color: var(--text-color);">No job offers yet</h3>
+        <p style="margin:0 0 1.25rem 0;">
+          Create your first job offer to start collecting candidates.
+        </p>
+        <a class="btn btn-primary" href="/post_job">Create a job offer</a>
+      </div>
+    {% endif %}
+  </main>
+
+  <footer>
+    &copy; 2025 {{ company_name }}. All rights reserved.
+  </footer>
+
+</body>
+</html>
