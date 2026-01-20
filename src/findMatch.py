@@ -1,13 +1,7 @@
-"""
-
-Module to find a match score between resume text and job description using simple NLP techniques.
-
-"""
-
-import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from models.job import Job
+import re
+from src.models.job import Job
 
 def clean_text(text: str) -> str:
     """Simple text cleaning"""
