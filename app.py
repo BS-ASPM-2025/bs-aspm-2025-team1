@@ -8,7 +8,7 @@ Sets up FastAPI app, routes, and middleware.
 import os
 import shutil
 from contextlib import asynccontextmanager
-
+from passlib.context import CryptContext
 import sqlite3
 from fastapi import FastAPI, Request, Depends, Form, File, UploadFile, HTTPException
 from fastapi.responses import RedirectResponse
@@ -128,6 +128,7 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     db.add(resume_test)
     db.commit()
     db.refresh(resume_test)
+    # todo: find all matching jobs and store the matches
     return RedirectResponse(url="/resume_upload_feedback", status_code=303)
 
 #--------------------------------------------------------------
@@ -164,6 +165,20 @@ async def passcode_submit(password: str = Form(...)):
 
 if __name__ == '__main__':
     import uvicorn
+
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    db = next(get_db())
+    from models.company import Company
+
+    demo_company = Company(
+        company_name="Demo",
+        password= pwd_context.hash("Demo1234")
+    )
+
+    # Add and commit to the database
+    db.add(demo_company)
+    db.commit()
+    db.refresh(demo_company)
     uvicorn.run("app:app", port=8000,host='0.0.0.0', reload=False, workers=4)
 
 #--------------------------------------------------------------
