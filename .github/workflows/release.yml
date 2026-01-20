@@ -2,13 +2,13 @@ name: release.yml
 on:
   pull_request:
     types: [closed]
-    branches: ["dev"]
+    branches: ["Ayman"]
   workflow_dispatch:
   workflow_run:
     workflows: ["Continues Development Pipeline"]
     types:
       - completed
-    branches: ["dev"]
+    branches: ["Ayman"]
   push:
     tags:
       - 'v*'
