@@ -32,7 +32,7 @@ jobs:
 
   deploy-pages:
     needs: test
-    # if: github.event_name == 'pull_request' # Uncomment to enable GitHub Pages deployment only for PRs
+    if: github.event_name == 'pull_request' # Uncomment to enable GitHub Pages deployment only for PRs
     permissions:
       pages: write
       id-token: write
