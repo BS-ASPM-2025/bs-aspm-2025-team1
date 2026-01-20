@@ -18,6 +18,7 @@ from src.handlepdf import extract_text_from_pdf
 from src.web.auth_controller import router as auth_router
 from src.web.job_controller import router as job_router
 from src.web.resume_controller import router as resume_router
+from src.web.match_controller import router as match_controller
 
 logger = logging.getLogger("startup")
 
@@ -50,7 +51,7 @@ app = FastAPI(title="Resume–Job Matcher", lifespan=lifespan, middleware=middle
 app.include_router(auth_router)
 app.include_router(job_router)
 app.include_router(resume_router)
-
+app.include_router(match_controller)
 @app.get("/")
 async def root(request: Request):
     return templates.TemplateResponse(
