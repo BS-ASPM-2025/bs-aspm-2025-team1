@@ -32,6 +32,12 @@ class ResumeRepository:
             .all()
         )
 
+    def list_all(self, db: Session, limit: int | None = None) -> list[Resume]:
+        q = db.query(Resume).order_by(Resume.created_at.desc())
+        if limit is not None:
+            q = q.limit(int(limit))
+        return q.all()
+
     def delete(self, db: Session, resume: Resume) -> None:
         db.delete(resume)
         db.commit()
