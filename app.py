@@ -23,7 +23,6 @@ from models import Resume
 from src.handlepdf import extract_text_from_pdf
 from src.web.auth_controller import router as auth_router
 from src.web.job_controller import router as job_router
-from typing import Generator
 
 templates = Jinja2Templates(directory="templates")
 
