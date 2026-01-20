@@ -1,3 +1,9 @@
+"""
+
+This script initializes a demo company in the database.
+
+"""
+
 from shared.database import SessionLocal
 from models.company import Company
 from src.security.passwords import hash_password
