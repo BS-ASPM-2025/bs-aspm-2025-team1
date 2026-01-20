@@ -1,6 +1,6 @@
 name:
 ResMe
-test.jobseeker@example.com
+jobseeker1@mail.com
 pass:
 Test1234!
 
