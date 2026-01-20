@@ -19,9 +19,10 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import HTMLResponse
 
 from shared import get_db, engine, Base
-from models import Resume, Job, Match
+from models import Resume, Job, Match, Company
 from src.handlepdf import extract_text_from_pdf
 from src.findMatch import calculate_match_score
+from src.security.passwords import hash_password
 from src.web.auth_controller import router as auth_router
 from src.web.job_controller import router as job_router
 
@@ -34,7 +35,25 @@ SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "1800"))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Ensure tables are created
     Base.metadata.create_all(bind=engine)
+    
+    # Initialize a demo company if it doesn't exist
+    db = next(get_db())
+    try:
+        existing_company = db.query(Company).filter_by(company_name="Demo Company").first()
+        if not existing_company:
+            demo_company = Company(
+                company_name="Demo Company",
+                password=hash_password("demo_password123")
+            )
+            db.add(demo_company)
+            db.commit()
+            print("Demo company created successfully.")
+    except Exception as e:
+        print(f"Error creating demo company: {e}")
+    finally:
+        db.close()
     yield
 
 middleware = [
