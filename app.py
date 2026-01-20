@@ -128,6 +128,7 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     db.add(resume_test)
     db.commit()
     db.refresh(resume_test)
+    # todo: find all matching jobs and store the matches
     return RedirectResponse(url="/resume_upload_feedback", status_code=303)
 
 #--------------------------------------------------------------
