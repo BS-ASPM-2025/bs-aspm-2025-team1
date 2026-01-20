@@ -19,8 +19,9 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import HTMLResponse
 
 from shared import get_db, engine, Base
-from models import Resume
+from models import Resume, Job, Match
 from src.handlepdf import extract_text_from_pdf
+from src.findMatch import calculate_match_score
 from src.web.auth_controller import router as auth_router
 from src.web.job_controller import router as job_router
 
@@ -128,7 +129,27 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     db.add(resume_test)
     db.commit()
     db.refresh(resume_test)
-    # todo: find all matching jobs and store the matches
+    # find all matching jobs and store the matches
+    jobs = db.query(Job).all()
+    results = []
+    for job in jobs:
+        score = calculate_match_score(text, job)
+        match_entry = Match(
+            resume_text=text,
+            job_text=job.job_text,
+            match_score=score
+        )
+        db.add(match_entry)
+        results.append({
+            "title": job.title or "Unknown Position",
+            "company": job.company or "Unknown Company",
+            "score": score
+        })
+    db.commit()
+
+    # Store results in session for display
+    request.session["match_results"] = results
+
     return RedirectResponse(url="/resume_upload_feedback", status_code=303)
 
 #--------------------------------------------------------------
@@ -140,10 +161,14 @@ async def resume_upload_feedback_page(request: Request):
     :param request: FastAPI Request object
     :return: Rendered HTML response
     """
+    results = request.session.pop("match_results", [])
     return templates.TemplateResponse(
         request=request,
         name="resume_upload_feedback.html",
-        context={"company_name": "ResMe"}
+        context={
+            "company_name": "ResMe",
+            "results": results
+        }
     )
 
 #@app.post("/resume_upload_feedback", include_in_schema=False)
@@ -166,19 +191,19 @@ async def passcode_submit(password: str = Form(...)):
 if __name__ == '__main__':
     import uvicorn
 
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    db = next(get_db())
-    from models.company import Company
-
-    demo_company = Company(
-        company_name="Demo",
-        password= pwd_context.hash("Demo1234")
-    )
-
-    # Add and commit to the database
-    db.add(demo_company)
-    db.commit()
-    db.refresh(demo_company)
+    # pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    # db = next(get_db())
+    # from models.company import Company
+    #
+    # demo_company = Company(
+    #     company_name="Demo",
+    #     password= pwd_context.hash("Demo1234")
+    # )
+    #
+    # # Add and commit to the database
+    # db.add(demo_company)
+    # db.commit()
+    # db.refresh(demo_company)
     uvicorn.run("app:app", port=8000,host='0.0.0.0', reload=False, workers=4)
 
 #--------------------------------------------------------------
