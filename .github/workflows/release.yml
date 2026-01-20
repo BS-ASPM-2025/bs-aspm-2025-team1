@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: dev  # Always check out dev branch
+          ref: Ayman  # Always check out dev branch
           fetch-depth: 0  # Fetch all history for proper tagging
 
       - name: login-docker
@@ -84,7 +84,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: dev
+          ref: Ayman
           fetch-depth: 0
 
       - name: Login to Docker Hub
