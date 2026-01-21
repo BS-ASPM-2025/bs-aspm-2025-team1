@@ -6,7 +6,6 @@ An AI-powered web application that matches job seeker resumes with job offers us
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)](https://fastapi.tiangolo.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
@@ -390,4 +389,5 @@ This project was developed as part of the **Advanced Software Project Management
 - OpenAI ChatGPT for AI-assisted development
 
 ---
+
 
