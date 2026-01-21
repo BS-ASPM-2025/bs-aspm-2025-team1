@@ -3,6 +3,7 @@
 **Resume-to-Job Matching Web System**
 
 An AI-powered web application that matches job seeker resumes with job offers using TF-IDF and cosine similarity algorithms.
+
 ---
 
 ##  Table of Contents
@@ -385,5 +386,6 @@ This project was developed as part of the **Advanced Software Project Management
 - OpenAI ChatGPT for AI-assisted development
 
 ---
+
 
 
