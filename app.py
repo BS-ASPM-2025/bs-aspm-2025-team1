@@ -166,8 +166,8 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
         })
     db.commit()
 
-    # Store results in session for display
-    request.session["match_results"] = results
+    # Store results in the session for display
+    request.session["match_results"] = results[:3]  # Store top 3 results
 
     return RedirectResponse(url="/resume_upload_feedback", status_code=303)
 
@@ -189,10 +189,6 @@ async def resume_upload_feedback_page(request: Request):
             "results": results
         }
     )
-
-#@app.post("/resume_upload_feedback", include_in_schema=False)
-#async def resume_upload_feedback_return(password: str = Form(...)):
-#    return RedirectResponse(url="/", status_code=303)
 
 #--------------------------------------------------------------
 @app.get("/passcode", include_in_schema=False)
