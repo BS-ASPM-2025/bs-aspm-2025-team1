@@ -92,7 +92,7 @@ async def hello_page(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="upload_resume.html",
-        context={"company_name": "ResMe"}  # Pass data to the template here
+        context={"company_name": "ResuMe"}  # Pass data to the template here
     )
 @app.post("/upload_resume")
 async def upload_resume(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
@@ -111,7 +111,7 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
         return templates.TemplateResponse(
             request=request,
             name="upload_resume.html",
-            context={"company_name": "ResMe", "error": "Invalid file type. Only PDF and DOC/DOCX allowed."}
+            context={"company_name": "ResuMe", "error": "Invalid file type. Only PDF and DOC/DOCX allowed."}
         )
 
     # Check size
@@ -123,7 +123,7 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
         return templates.TemplateResponse(
             request=request,
             name="upload_resume.html",
-            context={"company_name": "ResMe", "error": "File too large. Max size is 5MB."}
+            context={"company_name": "ResuMe", "error": "File too large. Max size is 5MB."}
         )
 
     upload_dir = "uploads"
@@ -185,7 +185,7 @@ async def resume_upload_feedback_page(request: Request):
         request=request,
         name="resume_upload_feedback.html",
         context={
-            "company_name": "ResMe",
+            "company_name": "ResuMe",
             "results": results
         }
     )
@@ -200,7 +200,7 @@ async def passcode_page(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="passcode.html",
-        context={"company_name": "ResMe"}
+        context={"company_name": "ResuMe"}
     )
 
 @app.post("/passcode", include_in_schema=False)
@@ -262,7 +262,7 @@ async def jobs_list(
             "JOBS_LIST.html",
             {
                 "request": request,
-                "company_name": "ResMe",
+                "company_name": "ResuMe",
                 "jobs": jobs
             }
         )
