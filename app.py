@@ -79,7 +79,7 @@ async def root(request: Request):
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"company_name": "ResMe"}
+        context={"company_name": "ResuMe"}
     )
 #--------------------------------------------------------------
 @app.get("/upload_resume", include_in_schema=False)
