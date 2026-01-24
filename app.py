@@ -8,7 +8,6 @@ Sets up FastAPI app, routes, and middleware.
 import os
 import shutil
 from contextlib import asynccontextmanager
-import sqlite3
 from fastapi import FastAPI, Request, Depends, Form, File, UploadFile, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -26,7 +25,6 @@ from src.web.job_controller import router as job_router
 
 templates = Jinja2Templates(directory="templates")
 
-DB_PATH = "my_database.db"
 APP_NAME = os.getenv("APP_NAME", "ResuMe")
 SESSION_SECRET = os.getenv("SESSION_SECRET", "dev-change-me")
 SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "1800"))
@@ -215,46 +213,18 @@ if __name__ == '__main__':
 
 #--------------------------------------------------------------
 
-def get_sqlite_conn():
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    try:
-        yield conn
-    finally:
-        conn.close()
-
-
 @app.get("/jobs_list", include_in_schema=False)
-async def jobs_list(
-    request: Request,
-    conn: sqlite3.Connection = Depends(get_sqlite_conn)
-):
+async def jobs_list(request: Request, db: Session = Depends(get_db)):
     try:
-        cur = conn.execute("""
-            SELECT
-                id,
-                title,
-                company,
-                degree,
-                degree_weight,
-                experience,
-                required_skills,
-                skills_weight,
-                job_text
-            FROM jobs
-            ORDER BY id DESC
-        """)
-        jobs = cur.fetchall()
-
+        jobs = db.query(Job).order_by(Job.id.desc()).all()
         return templates.TemplateResponse(
-            "JOBS_LIST.html",
+            "jobs_list.html",
             {
                 "request": request,
                 "company_name": "ResMe",
                 "jobs": jobs
             }
         )
-
     except Exception as e:
         print("JOBS_LIST ERROR:", repr(e))
         return HTMLResponse(
