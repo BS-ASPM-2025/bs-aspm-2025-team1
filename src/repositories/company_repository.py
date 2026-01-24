@@ -5,7 +5,7 @@ class CompanyRepository:
     def get_by_name(self, db: Session, company_name: str) -> Company | None:
         return (
             db.query(Company)
-            .filter(Company.company_name == company_name)
+            .filter(Company.company == company_name)
             .one_or_none()
         )
 
@@ -18,4 +18,4 @@ class CompanyRepository:
 
     def get_name_by_id(self, db: Session, company_id: int) -> str | None:
         company = self.get_by_id(db, company_id)
-        return company.company_name if company else None
+        return company.company if company else None
