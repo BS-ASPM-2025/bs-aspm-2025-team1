@@ -50,8 +50,8 @@ def client(db_session, monkeypatch):
     Base.metadata.create_all(bind=engine)
 
     # override DB dependency
-    def override_get_db():
-        yield db_session
+    # def override_get_db():
+    #     yield db_session
 
     app.dependency_overrides[get_db] = override_get_db
 
