@@ -8,8 +8,6 @@ Sets up FastAPI app, routes, and middleware.
 import os
 import shutil
 from contextlib import asynccontextmanager
-from passlib.context import CryptContext
-import sqlite3
 from fastapi import FastAPI, Request, Depends, Form, File, UploadFile, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -19,16 +17,14 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import HTMLResponse
 
 from shared import get_db, engine, Base
-from models import Resume, Job, Match, Company
+from models import Resume, Job, Match
 from src.handlepdf import extract_text_from_pdf
 from src.findMatch import calculate_match_score
-from src.security.passwords import hash_password
 from src.web.auth_controller import router as auth_router
 from src.web.job_controller import router as job_router
 
 templates = Jinja2Templates(directory="templates")
 
-DB_PATH = "my_database.db"
 APP_NAME = os.getenv("APP_NAME", "ResuMe")
 SESSION_SECRET = os.getenv("SESSION_SECRET", "dev-change-me")
 SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "1800"))
@@ -41,15 +37,7 @@ async def lifespan(app: FastAPI):
     # Initialize a demo company if it doesn't exist
     db = next(get_db())
     try:
-        existing_company = db.query(Company).filter_by(company_name="Demo Company").first()
-        if not existing_company:
-            demo_company = Company(
-                company_name="Demo Company",
-                password=hash_password("demo_password123")
-            )
-            db.add(demo_company)
-            db.commit()
-            print("Demo company created successfully.")
+        pass
     except Exception as e:
         print(f"Error creating demo company: {e}")
     finally:
@@ -166,8 +154,10 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
         })
     db.commit()
 
-    # Store results in the session for display
-    request.session["match_results"] = results[:3]  # Store top 3 results
+    # Store results in the session for display (top 3 by score descending)
+    request.session["match_results"] = sorted(
+        results, key=lambda x: x["score"], reverse=True
+    )[:3]
 
     return RedirectResponse(url="/resume_upload_feedback", status_code=303)
 
@@ -223,46 +213,18 @@ if __name__ == '__main__':
 
 #--------------------------------------------------------------
 
-def get_sqlite_conn():
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    try:
-        yield conn
-    finally:
-        conn.close()
-
-
 @app.get("/jobs_list", include_in_schema=False)
-async def jobs_list(
-    request: Request,
-    conn: sqlite3.Connection = Depends(get_sqlite_conn)
-):
+async def jobs_list(request: Request, db: Session = Depends(get_db)):
     try:
-        cur = conn.execute("""
-            SELECT
-                id,
-                title,
-                company,
-                degree,
-                degree_weight,
-                experience,
-                required_skills,
-                skills_weight,
-                job_text
-            FROM jobs
-            ORDER BY id DESC
-        """)
-        jobs = cur.fetchall()
-
+        jobs = db.query(Job).order_by(Job.id.desc()).all()
         return templates.TemplateResponse(
-            "JOBS_LIST.html",
+            "jobs_list.html",
             {
                 "request": request,
                 "company_name": "ResMe",
                 "jobs": jobs
             }
         )
-
     except Exception as e:
         print("JOBS_LIST ERROR:", repr(e))
         return HTMLResponse(
