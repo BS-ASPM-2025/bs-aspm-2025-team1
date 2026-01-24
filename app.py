@@ -8,7 +8,6 @@ Sets up FastAPI app, routes, and middleware.
 import os
 import shutil
 from contextlib import asynccontextmanager
-from passlib.context import CryptContext
 import sqlite3
 from fastapi import FastAPI, Request, Depends, Form, File, UploadFile, HTTPException
 from fastapi.responses import RedirectResponse
@@ -19,10 +18,9 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import HTMLResponse
 
 from shared import get_db, engine, Base
-from models import Resume, Job, Match, Company
+from models import Resume, Job, Match
 from src.handlepdf import extract_text_from_pdf
 from src.findMatch import calculate_match_score
-from src.security.passwords import hash_password
 from src.web.auth_controller import router as auth_router
 from src.web.job_controller import router as job_router
 
@@ -41,15 +39,7 @@ async def lifespan(app: FastAPI):
     # Initialize a demo company if it doesn't exist
     db = next(get_db())
     try:
-        existing_company = db.query(Company).filter_by(company_name="Demo Company").first()
-        if not existing_company:
-            demo_company = Company(
-                company_name="Demo Company",
-                password=hash_password("demo_password123")
-            )
-            db.add(demo_company)
-            db.commit()
-            print("Demo company created successfully.")
+        pass
     except Exception as e:
         print(f"Error creating demo company: {e}")
     finally:
