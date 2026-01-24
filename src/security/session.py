@@ -36,7 +36,7 @@ def require_company_session(request: Request) -> int:
         request.session.clear()
         raise HTTPException(
             status_code=HTTP_303_SEE_OTHER,
-            headers={"Location": COMPANY_LOGIN_URL},
+            headers={"Location": "/passcode"}
         )
 
     sess["last"] = now
