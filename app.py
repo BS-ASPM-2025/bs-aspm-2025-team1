@@ -166,8 +166,10 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
         })
     db.commit()
 
-    # Store results in the session for display
-    request.session["match_results"] = results[:3]  # Store top 3 results
+    # Store results in the session for display (top 3 by score descending)
+    request.session["match_results"] = sorted(
+        results, key=lambda x: x["score"], reverse=True
+    )[:3]
 
     return RedirectResponse(url="/resume_upload_feedback", status_code=303)
 
