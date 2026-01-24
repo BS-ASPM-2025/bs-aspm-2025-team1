@@ -8,24 +8,35 @@ Sets up FastAPI app, routes, and middleware.
 import os
 import shutil
 from contextlib import asynccontextmanager
-from passlib.context import CryptContext
+
 import sqlite3
-from fastapi import FastAPI, Request, Depends, Form, File, UploadFile
+from typing import Optional
+from fastapi import FastAPI, Request, Depends, Form, File, UploadFile, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from starlette.responses import HTMLResponse
+from starlette.responses import HTMLResponse
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.status import HTTP_400_BAD_REQUEST
+
+from src.repositories.company_repository import CompanyRepository
+from src.repositories.job_repository import JobRepository
+from src.services.job_service import JobService
+
 from src.security.session import start_company_session, require_company_session
 
 from shared import get_db, engine, Base
 from models import Resume, Job, Match, Company
 from src.handlepdf import extract_text_from_pdf
 from src.findMatch import calculate_match_score
-from src.web.auth_controller import router as auth_router
-from src.web.job_controller import router as job_router
+
 
 templates = Jinja2Templates(directory="templates")
+
+_company_repo = CompanyRepository()
+_job_repo = JobRepository()
+_job_service = JobService(_job_repo, _company_repo)
 
 DB_PATH = "my_database.db"
 APP_NAME = os.getenv("APP_NAME", "ResuMe")
@@ -71,12 +82,12 @@ app.add_middleware(
     secret_key=SESSION_SECRET,
     max_age=SESSION_TTL_SECONDS,
 )
-app.include_router(auth_router)
-app.include_router(job_router)
+# app.include_router(auth_router)
+# app.include_router(job_router)
 
-for r in app.routes:
-    if getattr(r, "path", None) == "/post_job":
-        print("POST_JOB ROUTE:", r.name, r.endpoint)
+# for r in app.routes:
+#     if getattr(r, "path", None) == "/post_job":
+#         print("POST_JOB ROUTE:", r.name, r.endpoint)
 
 @app.get("/")
 async def root(request: Request):
@@ -213,11 +224,8 @@ async def passcode_page(request: Request):
     )
 
 @app.post("/passcode", include_in_schema=False)
-async def passcode_submit(
-    request: Request,
-    password: str = Form(...),
-    db: Session = Depends(get_db),
-):
+async def passcode_submit(request: Request, password: str = Form(...),
+    db: Session = Depends(get_db),):
     password = password.strip()
 
     if not password:
@@ -238,9 +246,7 @@ async def passcode_submit(
 
     # the RIGHT way (compatible with session.py)
     start_company_session(request, company_id=record.id)
-
-    # optional: for showing company name in template
-    start_company_session(request, company_id=record.id)
+    request.session["company_name"] = record.company
 
     return RedirectResponse(url="/post_job", status_code=303)
 #---------------------------------------------------------
@@ -322,7 +328,56 @@ async def post_job_page(request: Request, db: Session = Depends(get_db)):
         request=request,
         name="post_job.html",
         context={
-            "company_name": "ResuMe",
+            "company_name": company_obj.company,
             "company": company_obj.company if company_obj else ""
         }
+    )
+
+
+@app.post("/post_job", include_in_schema=False)
+async def post_job(
+    request: Request,
+    company_id: int = Depends(require_company_session),
+    title: str = Form(...),
+    degree: str = Form(...),
+    experience: str = Form(...),
+    required_skills: str = Form(...),
+    job_text: str = Form(...),
+
+    skills_weight: float = Form(1.0),
+    degree_weight: float = Form(1.0),
+    experience_weight: float = Form(1.0),
+    weight_general: float = Form(1.0),
+
+    db: Session = Depends(get_db),
+):
+    try:
+        _job_service.create_offer(
+            db,
+            company_id=company_id,
+            title=title,
+            degree=degree,
+            experience=experience,
+            required_skills=required_skills,
+            job_text=job_text,
+            skills_weight=skills_weight,
+            degree_weight=degree_weight,
+            experience_weight=experience_weight,
+            weight_general=weight_general,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(e))
+
+    return RedirectResponse(url="/post_job_feedback", status_code=303)
+
+
+@app.get("/post_job_feedback", include_in_schema=False)
+async def post_job_feedback_page(
+    request: Request,
+    company_id: int = Depends(require_company_session),
+):
+    return templates.TemplateResponse(
+        request=request,
+        name="post_job_feedback.html",
+        context={"company_name": APP_NAME},
     )
