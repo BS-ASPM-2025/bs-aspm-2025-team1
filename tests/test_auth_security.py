@@ -33,7 +33,7 @@ def run_around_tests(client):
 def create_company(name, password):
     db = TestingSessionLocal()
     hashed = hash_password(password)
-    company = Company(company_name=name, password=hashed)
+    company = Company(company=name, password=hashed)
     db.add(company)
     db.commit()
     db.refresh(company)
