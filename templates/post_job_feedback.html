@@ -200,63 +200,37 @@
     <div class="container">
       <section class="hero">
         <h1>We Found Your Best Matches</h1>
-        <p>These are the best candidates for your job.</p>
+        <p>
+          {% if job_title %}
+            These are the best candidates for <strong>{{ job_title }}</strong>.
+          {% else %}
+            These are the best candidates for your job.
+          {% endif %}
+        </p>
       </section>
 
       <section class="cards-grid">
-        <!-- Candidate 1 -->
-        <article class="card">
-          <div class="card-top">
-            <div class="card-icon">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-              </svg>
+        {% if candidates %}
+          {% for c in candidates %}
+          <article class="card">
+            <div class="card-top">
+              <div class="card-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+              <div>
+                <p class="card-title">{{ c.resume_name }}</p>
+                <p class="card-meta">Match: {{ c.score }}%</p>
+              </div>
             </div>
-            <div>
-              <p class="card-title">Candidate Name</p>
-              <p class="card-meta">Match: 92% </p>
-              <p class="card-meta">Location: Tel Aviv</p>
-            </div>
-          </div>
-          <a href="#" class="card-link">Resume here <span aria-hidden="true">→</span></a>
-        </article>
-
-        <!-- Candidate 2 -->
-        <article class="card">
-          <div class="card-top">
-            <div class="card-icon">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-              </svg>
-            </div>
-            <div>
-              <p class="card-title">Candidate Name</p>
-              <p class="card-meta">Match: 88%</p>
-              <p class="card-meta">Location: Haifa</p>
-            </div>
-          </div>
-          <a href="#" class="card-link">Resume here <span aria-hidden="true">→</span></a>
-        </article>
-
-        <!-- Candidate 3 -->
-        <article class="card">
-          <div class="card-top">
-            <div class="card-icon">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-              </svg>
-            </div>
-            <div>
-              <p class="card-title">Candidate Name</p>
-              <p class="card-meta">Match: 84%</p>
-              <p class="card-meta">Location: Beer Sheva</p>
-            </div>
-          </div>
-          <a href="#" class="card-link">Resume here <span aria-hidden="true">→</span></a>
-        </article>
+            <a href="#" class="card-link">Resume ID: {{ c.resume_id }} <span aria-hidden="true">→</span></a>
+          </article>
+          {% endfor %}
+        {% else %}
+          <p>No candidates found yet. Upload resumes first, then post a job again.</p>
+        {% endif %}
       </section>
     </div>
   </main>
