@@ -24,4 +24,4 @@ def test_post_job_post_requires_company_session(client):
     r = client.post("/post_job", data=job_data, follow_redirects=False)
 
     assert r.status_code in (302, 303)
-    assert r.headers["location"] == "/company/login"
+    assert r.headers["location"] == "/passcode"
