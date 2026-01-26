@@ -26,7 +26,7 @@ def test_passcode_get_loads(client):
 
 def test_passcode_post_redirects_to_post_job(client):
     """
-    Tests that submitting the passcode redirects to the post job page.
+    Tests that submitting the passcode redirects to the post-job page.
     :param client: TestClient fixture provided by conftest.py
     :return: None
     """
@@ -36,7 +36,7 @@ def test_passcode_post_redirects_to_post_job(client):
 
 def test_post_job_get_requires_company_session(client):
     """
-    Tests that accessing the post job page without a company session redirects to log in.
+    Tests that accessing the post-job page without a company session redirects to log in.
     :param client: TestClient fixture provided by conftest.py
     :return: None
     """
