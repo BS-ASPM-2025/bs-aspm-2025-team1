@@ -8,7 +8,7 @@ import time
 from unittest import mock
 
 # Constants from your app/session logic
-LOGIN_URL = "/passcode"
+LOGIN_URL = "/passcode?next=/post_job"
 POST_JOB_URL = "/post_job"
 LOGOUT_URL = "/logout"
 SESSION_TTL_SECONDS = 1800  # Default from app.py/session.py
