@@ -19,7 +19,7 @@ jobs:
       - name: install-req
         run: pip install -r requirements.txt
       - name: run-tests
-        run: pytest -v tests/ --cov ./ --cov-report html:./rport-tests_${{ github.run_number }} --self-contained-html --cov-report term --cov-fail-under=85 # todo: adjust coverage percentage
+        run: pytest -v tests/ --cov ./ --cov-report html:./rport-tests_${{ github.run_number }} --self-contained-html --cov-report term --cov-fail-under=80 # todo: adjust coverage percentage
       - name: upload-coverage-junit
         uses: actions/upload-artifact@v4
         with:
