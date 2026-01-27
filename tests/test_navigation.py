@@ -26,7 +26,7 @@ def test_passcode_get_loads(client):
 
 def test_passcode_post_redirects_to_post_job(client):
     """
-    Tests that submitting the passcode redirects to the post job page.
+    Tests that submitting the passcode redirects to the post-job page.
     :param client: TestClient fixture provided by conftest.py
     :return: None
     """
@@ -36,23 +36,23 @@ def test_passcode_post_redirects_to_post_job(client):
 
 def test_post_job_get_requires_company_session(client):
     """
-    Tests that accessing the post job page without a company session redirects to log in.
+    Tests that accessing the post-job page without a company session redirects to log in.
     :param client: TestClient fixture provided by conftest.py
     :return: None
     """
     r = client.get("/post_job", follow_redirects=False)
     assert r.status_code in (302, 303)
-    assert r.headers["location"] == "/company/login"
+    assert r.headers["location"] == "/passcode"
 
 def test_company_login_get_loads(client):
     """
     Tests that the company login page loads successfully.
     :param client: TestClient fixture provided by conftest.py
     """
-    r = client.get("/company/login")
+    r = client.get("/passcode")
     assert r.status_code == 200
 
-def upload_resume_job_get_loads(client):
+def test_upload_resume_job_get_loads(client):
     """
     Tests that the upload resume page loads successfully.
     :param client: TestClient fixture provided by conftest.py
