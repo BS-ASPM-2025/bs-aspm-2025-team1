@@ -270,39 +270,12 @@ if __name__ == '__main__':
 
 #JOB_LIST--------------------------------------------------------------
 
-def get_sqlite_conn():
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    try:
-        yield conn
-    finally:
-        conn.close()
-
-
 @app.get("/jobs_list", include_in_schema=False)
-async def jobs_list(
-    request: Request,
-    conn: sqlite3.Connection = Depends(get_sqlite_conn)
-):
+async def jobs_list(request: Request, db: Session = Depends(get_db)):
     try:
-        cur = conn.execute("""
-            SELECT
-                id,
-                title,
-                company,
-                degree,
-                degree_weight,
-                experience,
-                required_skills,
-                skills_weight,
-                job_text
-            FROM jobs
-            ORDER BY id DESC
-        """)
-        jobs = cur.fetchall()
-
+        jobs = db.query(Job).all()
         return templates.TemplateResponse(
-            "JOBS_LIST.html",
+            "jobs_list.html",
             {
                 "request": request,
                 "company_name": "ResuMe",
