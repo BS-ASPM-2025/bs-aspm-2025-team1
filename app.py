@@ -404,3 +404,19 @@ async def post_job_feedback_page(
             "job_title": posted_job_title,
         },
     )
+
+#hr_jobs_list--------------------------------------------------
+@app.get("/hr_jobs_list", include_in_schema=False)
+async def ht_jobs_list_page(request: Request, db: Session = Depends(get_db)):
+    #company_id = require_company_session(request)
+
+    #company_obj = db.query(Company).filter(Company.id == company_id).first()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="hr_jobs_list.html",
+        context={
+            #"company_name": company_obj.company,
+            #"company": company_obj.company if company_obj else ""
+        }
+    )
