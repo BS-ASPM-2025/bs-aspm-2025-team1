@@ -24,7 +24,7 @@ from src.repositories.company_repository import CompanyRepository
 from src.repositories.job_repository import JobRepository
 from src.services.job_service import JobService
 
-from src.security.session import start_company_session, require_company_session
+from src.security.session import start_company_session, require_company_session, logout
 
 from shared import get_db, engine, Base
 from models import Resume, Job, Match, Company
@@ -249,6 +249,15 @@ async def passcode_submit(request: Request, password: str = Form(...),
     request.session["company_name"] = record.company
 
     return RedirectResponse(url="/post_job", status_code=303)
+
+
+@app.get("/logout", include_in_schema=False)
+async def logout_route(request: Request):
+    """
+    Clear the current recruiter/company session and redirect to home.
+    """
+    logout(request)
+    return RedirectResponse(url="/", status_code=303)
 #---------------------------------------------------------
 if __name__ == '__main__':
     import uvicorn
