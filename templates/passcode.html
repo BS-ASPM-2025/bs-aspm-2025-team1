@@ -129,6 +129,7 @@
 
 
     <form action="/passcode" method="post" autocomplete="off">
+      <input type="hidden" name="next" value="{{ next or '/post_job' }}" />
       <div class="field">
         <label for="password">Password</label>
         <div class="input-wrap">

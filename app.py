@@ -24,7 +24,13 @@ from src.repositories.company_repository import CompanyRepository
 from src.repositories.job_repository import JobRepository
 from src.services.job_service import JobService
 
-from src.security.session import start_company_session, require_company_session
+from src.security.session import (
+    start_company_session,
+    require_company_session,
+    logout,
+    has_valid_company_session,
+    # get_safe_next_path,
+)
 
 from shared import get_db, engine, Base
 from models import Resume, Job, Match, Company
@@ -217,22 +223,32 @@ async def resume_upload_feedback_page(request: Request):
 #PASSCODE--------------------------------------------------------------
 @app.get("/passcode", include_in_schema=False)
 async def passcode_page(request: Request):
+    # If already logged in, skip passcode and go straight to target.
+    # next_path = get_safe_next_path(request.query_params.get("next"), default="/post_job")
+    next_path = request.query_params.get("next")
+    if has_valid_company_session(request):
+        return RedirectResponse(url=next_path, status_code=303)
     return templates.TemplateResponse(
         request=request,
         name="passcode.html",
-        context={"company_name": "ResuMe"}
+        context={"company_name": "ResuMe", "next": next_path}
     )
 
 @app.post("/passcode", include_in_schema=False)
-async def passcode_submit(request: Request, password: str = Form(...),
+async def passcode_submit(
+    request: Request,
+    password: str = Form(...),
+    next: str = Form("/post_job"),
     db: Session = Depends(get_db),):
+    # next_path = get_safe_next_path(next, default="/post_job")
+    next_path = next,
     password = password.strip()
 
     if not password:
         return templates.TemplateResponse(
             request=request,
             name="passcode.html",
-            context={"company_name": "ResuMe", "error": "Please enter a password."}
+            context={"company_name": "ResuMe", "error": "Please enter a password.", "next": next_path}
         )
 
     record = db.query(Company).filter(Company.password == password).first()
@@ -241,14 +257,23 @@ async def passcode_submit(request: Request, password: str = Form(...),
         return templates.TemplateResponse(
             request=request,
             name="passcode.html",
-            context={"company_name": "ResuMe", "error": "Wrong password. Please try again."}
+            context={"company_name": "ResuMe", "error": "Wrong password. Please try again.", "next": next_path}
         )
 
     # the RIGHT way (compatible with session.py)
     start_company_session(request, company_id=record.id)
     request.session["company_name"] = record.company
 
-    return RedirectResponse(url="/post_job", status_code=303)
+    return RedirectResponse(url=next_path, status_code=303)
+
+
+@app.get("/logout", include_in_schema=False)
+async def logout_route(request: Request):
+    """
+    Clear the current recruiter/company session and redirect to home.
+    """
+    logout(request)
+    return RedirectResponse(url="/", status_code=303)
 #---------------------------------------------------------
 if __name__ == '__main__':
     import uvicorn
@@ -270,39 +295,12 @@ if __name__ == '__main__':
 
 #JOB_LIST--------------------------------------------------------------
 
-def get_sqlite_conn():
-    conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row
-    try:
-        yield conn
-    finally:
-        conn.close()
-
-
 @app.get("/jobs_list", include_in_schema=False)
-async def jobs_list(
-    request: Request,
-    conn: sqlite3.Connection = Depends(get_sqlite_conn)
-):
+async def jobs_list(request: Request, db: Session = Depends(get_db)):
     try:
-        cur = conn.execute("""
-            SELECT
-                id,
-                title,
-                company,
-                degree,
-                degree_weight,
-                experience,
-                required_skills,
-                skills_weight,
-                job_text
-            FROM jobs
-            ORDER BY id DESC
-        """)
-        jobs = cur.fetchall()
-
+        jobs = db.query(Job).all()
         return templates.TemplateResponse(
-            "JOBS_LIST.html",
+            "jobs_list.html",
             {
                 "request": request,
                 "company_name": "ResuMe",
@@ -352,7 +350,7 @@ async def post_job(
     db: Session = Depends(get_db),
 ):
     try:
-        _job_service.create_offer(
+        created_job = _job_service.create_offer(
             db,
             company_id=company_id,
             title=title,
@@ -368,6 +366,22 @@ async def post_job(
     except ValueError as e:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(e))
 
+    # Build a best-candidates list (top resumes for this job) and pass it via session
+    resumes = db.query(Resume).all()
+    candidate_results = []
+    for r in resumes:
+        score = calculate_match_score(r.resume_text, created_job)
+        candidate_results.append({
+            "resume_id": r.id,
+            "resume_name": r.id_text or f"Resume #{r.id}",
+            "score": score,
+        })
+    candidate_results.sort(key=lambda x: x["score"], reverse=True)
+
+    # Keep a small list for UI (adjust as desired)
+    request.session["candidate_results"] = candidate_results[:9]
+    request.session["posted_job_title"] = created_job.title or "(untitled)"
+
     return RedirectResponse(url="/post_job_feedback", status_code=303)
 
 
@@ -375,9 +389,18 @@ async def post_job(
 async def post_job_feedback_page(
     request: Request,
     company_id: int = Depends(require_company_session),
+    db: Session = Depends(get_db),
 ):
+    company_obj = db.query(Company).filter(Company.id == company_id).first()
+    candidates = request.session.pop("candidate_results", [])
+    posted_job_title = request.session.pop("posted_job_title", None)
+
     return templates.TemplateResponse(
         request=request,
         name="post_job_feedback.html",
-        context={"company_name": APP_NAME},
+        context={
+            "company_name": company_obj.company if company_obj else APP_NAME,
+            "candidates": candidates,
+            "job_title": posted_job_title,
+        },
     )
