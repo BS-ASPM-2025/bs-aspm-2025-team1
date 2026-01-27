@@ -352,7 +352,7 @@ async def post_job(
     db: Session = Depends(get_db),
 ):
     try:
-        _job_service.create_offer(
+        created_job = _job_service.create_offer(
             db,
             company_id=company_id,
             title=title,
@@ -368,6 +368,22 @@ async def post_job(
     except ValueError as e:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(e))
 
+    # Build a best-candidates list (top resumes for this job) and pass it via session
+    resumes = db.query(Resume).all()
+    candidate_results = []
+    for r in resumes:
+        score = calculate_match_score(r.resume_text, created_job)
+        candidate_results.append({
+            "resume_id": r.id,
+            "resume_name": r.id_text or f"Resume #{r.id}",
+            "score": score,
+        })
+    candidate_results.sort(key=lambda x: x["score"], reverse=True)
+
+    # Keep a small list for UI (adjust as desired)
+    request.session["candidate_results"] = candidate_results[:9]
+    request.session["posted_job_title"] = created_job.title or "(untitled)"
+
     return RedirectResponse(url="/post_job_feedback", status_code=303)
 
 
@@ -375,9 +391,18 @@ async def post_job(
 async def post_job_feedback_page(
     request: Request,
     company_id: int = Depends(require_company_session),
+    db: Session = Depends(get_db),
 ):
+    company_obj = db.query(Company).filter(Company.id == company_id).first()
+    candidates = request.session.pop("candidate_results", [])
+    posted_job_title = request.session.pop("posted_job_title", None)
+
     return templates.TemplateResponse(
         request=request,
         name="post_job_feedback.html",
-        context={"company_name": APP_NAME},
+        context={
+            "company_name": company_obj.company if company_obj else APP_NAME,
+            "candidates": candidates,
+            "job_title": posted_job_title,
+        },
     )
