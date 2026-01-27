@@ -192,8 +192,24 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
         })
     db.commit()
 
+    # Select top matching jobs based on minimum score and cap
+    min_score = 20
+    top_n = 3
+    sorted_results = sorted(results, key=lambda c: c["score"], reverse=True)
+    eligible = [c for c in sorted_results if c["score"] >= min_score]
+
+    selected = eligible[:top_n]
+
+    # Guarantee at least some if many exist
+    if len(selected) == 0 and len(sorted_results) > 0:
+        # fallback: take the best few even if under threshold
+        fallback_n = min(5, len(sorted_results))
+        selected = sorted_results[:fallback_n]
+    
+    
+
     # Store results in session for display
-    request.session["match_results"] = results
+    request.session["match_results"] = selected
 
     return RedirectResponse(url="/resume_upload_feedback", status_code=303)
 
