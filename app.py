@@ -24,7 +24,13 @@ from src.repositories.company_repository import CompanyRepository
 from src.repositories.job_repository import JobRepository
 from src.services.job_service import JobService
 
-from src.security.session import start_company_session, require_company_session, logout
+from src.security.session import (
+    start_company_session,
+    require_company_session,
+    logout,
+    has_valid_company_session,
+    get_safe_next_path,
+)
 
 from shared import get_db, engine, Base
 from models import Resume, Job, Match, Company
@@ -217,22 +223,30 @@ async def resume_upload_feedback_page(request: Request):
 #PASSCODE--------------------------------------------------------------
 @app.get("/passcode", include_in_schema=False)
 async def passcode_page(request: Request):
+    # If already logged in, skip passcode and go straight to target.
+    next_path = get_safe_next_path(request.query_params.get("next"), default="/post_job")
+    if has_valid_company_session(request):
+        return RedirectResponse(url=next_path, status_code=303)
     return templates.TemplateResponse(
         request=request,
         name="passcode.html",
-        context={"company_name": "ResuMe"}
+        context={"company_name": "ResuMe", "next": next_path}
     )
 
 @app.post("/passcode", include_in_schema=False)
-async def passcode_submit(request: Request, password: str = Form(...),
+async def passcode_submit(
+    request: Request,
+    password: str = Form(...),
+    next: str = Form("/post_job"),
     db: Session = Depends(get_db),):
+    next_path = get_safe_next_path(next, default="/post_job")
     password = password.strip()
 
     if not password:
         return templates.TemplateResponse(
             request=request,
             name="passcode.html",
-            context={"company_name": "ResuMe", "error": "Please enter a password."}
+            context={"company_name": "ResuMe", "error": "Please enter a password.", "next": next_path}
         )
 
     record = db.query(Company).filter(Company.password == password).first()
@@ -241,14 +255,14 @@ async def passcode_submit(request: Request, password: str = Form(...),
         return templates.TemplateResponse(
             request=request,
             name="passcode.html",
-            context={"company_name": "ResuMe", "error": "Wrong password. Please try again."}
+            context={"company_name": "ResuMe", "error": "Wrong password. Please try again.", "next": next_path}
         )
 
     # the RIGHT way (compatible with session.py)
     start_company_session(request, company_id=record.id)
     request.session["company_name"] = record.company
 
-    return RedirectResponse(url="/post_job", status_code=303)
+    return RedirectResponse(url=next_path, status_code=303)
 
 
 @app.get("/logout", include_in_schema=False)

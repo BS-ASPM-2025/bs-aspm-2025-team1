@@ -42,7 +42,7 @@ def test_post_job_get_requires_company_session(client):
     """
     r = client.get("/post_job", follow_redirects=False)
     assert r.status_code in (302, 303)
-    assert r.headers["location"] == "/passcode"
+    assert r.headers["location"] == "/passcode?next=/post_job"
 
 def test_company_login_get_loads(client):
     """
