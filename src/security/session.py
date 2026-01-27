@@ -19,31 +19,6 @@ COMPANY_LOGIN_URL = "/passcode"
 SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "1800"))
 
 
-def _is_safe_next_path(next_path: Optional[str]) -> bool:
-    """
-    Only allow relative in-app redirects.
-    - Must start with '/'
-    - Must not start with '//' (scheme-relative)
-    - Must not contain control chars
-    """
-    if not next_path:
-        return False
-    if not next_path.startswith("/"):
-        return False
-    if next_path.startswith("//"):
-        return False
-    if any(ord(ch) < 32 for ch in next_path):
-        return False
-    return True
-
-
-def get_safe_next_path(next_path: Optional[str], default: str = "/post_job") -> str:
-    """
-    Returns a safe redirect target within this app.
-    """
-    return next_path if _is_safe_next_path(next_path) else default
-
-
 def has_valid_company_session(request: Request) -> bool:
     """
     Check whether the current request has a valid recruiter/company session.

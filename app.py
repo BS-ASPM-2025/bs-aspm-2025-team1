@@ -29,7 +29,7 @@ from src.security.session import (
     require_company_session,
     logout,
     has_valid_company_session,
-    get_safe_next_path,
+    # get_safe_next_path,
 )
 
 from shared import get_db, engine, Base
@@ -224,7 +224,8 @@ async def resume_upload_feedback_page(request: Request):
 @app.get("/passcode", include_in_schema=False)
 async def passcode_page(request: Request):
     # If already logged in, skip passcode and go straight to target.
-    next_path = get_safe_next_path(request.query_params.get("next"), default="/post_job")
+    # next_path = get_safe_next_path(request.query_params.get("next"), default="/post_job")
+    next_path = request.query_params.get("next")
     if has_valid_company_session(request):
         return RedirectResponse(url=next_path, status_code=303)
     return templates.TemplateResponse(
@@ -239,7 +240,8 @@ async def passcode_submit(
     password: str = Form(...),
     next: str = Form("/post_job"),
     db: Session = Depends(get_db),):
-    next_path = get_safe_next_path(next, default="/post_job")
+    # next_path = get_safe_next_path(next, default="/post_job")
+    next_path = next,
     password = password.strip()
 
     if not password:
