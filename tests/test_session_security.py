@@ -1,6 +1,11 @@
+"""
+
+Test session security
+
+"""
+
 import time
 from unittest import mock
-import pytest
 
 # Constants from your app/session logic
 LOGIN_URL = "/passcode"
