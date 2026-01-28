@@ -201,6 +201,16 @@
       <section class="hero">
         <h1>We Found Your Best Matches</h1>
         <p>You are best fir for those positions.</p>
+
+        {% if delete_url %}
+        <div class="success-alert" style="margin-top: 1rem;">
+          You can delete your resume at any time using this private link:
+          <a href="{{ delete_url }}" style="color: var(--primary-color); font-weight: 700;">
+            Delete my resume
+          </a>.
+          Please save or bookmark this link if you might want to remove your data later.
+        </div>
+        {% endif %}
       </section>
 
       <section class="cards-grid">
