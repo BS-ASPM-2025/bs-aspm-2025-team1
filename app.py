@@ -7,6 +7,7 @@ Sets up FastAPI app, routes, and middleware.
 
 import os
 import shutil
+import hashlib
 from contextlib import asynccontextmanager
 
 import sqlite3
@@ -163,13 +164,20 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
         try:
             text = extract_text_from_pdf(file_location)
         except Exception:
-            text = "" # Fail gracefully
+            text = ""  # Fail gracefully
     else:
-        text = "" # Placeholder for DOC/DOCX extraction later
+        text = ""  # Placeholder for DOC/DOCX extraction later
+
+    # Create a deletion token as the SHA-256 hash of the uploaded resume file.
+    # This makes the token deterministic for the exact same file content.
+    with open(file_location, "rb") as f:
+        file_bytes = f.read()
+    delete_token = hashlib.sha256(file_bytes).hexdigest()
 
     resume_test = Resume(
         resume_text=text,
-        id_text=file.filename
+        id_text=file.filename,
+        delete_token=delete_token,
     )
     db.add(resume_test)
     db.commit()
@@ -208,8 +216,10 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     
     
 
-    # Store results in session for display
+    # Store results and delete a link in the session for display
     request.session["match_results"] = selected
+    # Build an absolute-safe path for the delete link (token-based)
+    request.session["resume_delete_token"] = delete_token
 
     return RedirectResponse(url="/resume_upload_feedback", status_code=303)
 
@@ -223,13 +233,56 @@ async def resume_upload_feedback_page(request: Request):
     :return: Rendered HTML response
     """
     results = request.session.pop("match_results", [])
+    delete_token = request.session.pop("resume_delete_token", None)
+
+    delete_url = None
+    if delete_token:
+        delete_url = f"/delete_resume_by_token?token={delete_token}"
+
     return templates.TemplateResponse(
         request=request,
         name="resume_upload_feedback.html",
         context={
             "company_name": "ResuMe",
-            "results": results
+            "results": results,
+            "delete_url": delete_url,
         }
+    )
+
+
+@app.get("/delete_resume_by_token", include_in_schema=False)
+async def delete_resume_by_token(request: Request, token: str, db: Session = Depends(get_db)):
+    """
+    Delete a resume (and its stored file) using a one-time secret token.
+    This allows users to delete their data later via a magic link, without log in.
+    """
+    # Look up the resume by the provided deletion token
+    resume_obj = db.query(Resume).filter(Resume.delete_token == token).first()
+
+    if not resume_obj:
+        # Nothing to delete or token already used
+        return HTMLResponse(
+            "<h2>Resume not found</h2><p>The deletion link is invalid or has already been used.</p>",
+            status_code=404,
+        )
+
+    # Best-effort: delete the underlying file using id_text as the stored filename
+    upload_dir = "uploads"
+    file_path = os.path.join(upload_dir, resume_obj.id_text)
+    if os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+        except OSError:
+            # Fail quietly; we still remove the DB record
+            pass
+
+    # Delete the resume record itself
+    db.delete(resume_obj)
+    db.commit()
+
+    return HTMLResponse(
+        "<h2>Resume deleted</h2><p>Your resume and its matches have been removed from our system.</p>",
+        status_code=200,
     )
 
 #@app.post("/resume_upload_feedback", include_in_schema=False)
