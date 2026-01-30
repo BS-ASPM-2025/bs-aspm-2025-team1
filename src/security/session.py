@@ -32,7 +32,12 @@ def has_valid_company_session(request: Request) -> bool:
     return role == ROLE_RECRUITER and company_id is not None and isinstance(exp, int) and exp > now
 
 
-def start_company_session(request: Request, company_id: int, ttl_seconds: int = SESSION_TTL_SECONDS) -> None:
+def start_company_session(
+    request: Request,
+    company_id: int,
+    company_name: Optional[str] = None,
+    ttl_seconds: int = SESSION_TTL_SECONDS
+    ) -> None:
     """
     Start a company session
     :param request:
@@ -44,6 +49,7 @@ def start_company_session(request: Request, company_id: int, ttl_seconds: int = 
     request.session.clear()
     request.session.update({
         "company_id": int(company_id),
+        "company": company_name,
         "role": ROLE_RECRUITER,
         "iat": now,
         "last": now,
