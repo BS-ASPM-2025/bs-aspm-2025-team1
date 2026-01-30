@@ -498,22 +498,18 @@ async def hr_jobs_list(request: Request, db: Session = Depends(get_db)):
     )
 
 
-@app.post("/jobs/delete/{job_id}", include_in_schema=False)
-async def delete_job(job_id: int, request: Request, db: Session = Depends(get_db)):
-    _ = require_company_session(request)
-
+@app.post("/hr_jobs_list/delete/{job_id}")
+async def delete_job(request: Request, job_id: int, db: Session = Depends(get_db)):
+    require_company_session(request)
     company_name = request.session.get("company")
-    if not company_name:
-        raise HTTPException(status_code=401, detail="Missing company in session")
 
     job = db.query(Job).filter(Job.id == job_id).first()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
 
     if job.company != company_name:
-        raise HTTPException(status_code=403, detail="Not allowed to delete this job")
+        raise HTTPException(status_code=403, detail="Forbidden")
 
     db.delete(job)
     db.commit()
-
-    return RedirectResponse(url="/hr_jobs_list", status_code=303)
+    return RedirectResponse("/hr_jobs_list", status_code=303)
