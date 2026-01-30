@@ -513,3 +513,12 @@ async def delete_job(request: Request, job_id: int, db: Session = Depends(get_db
     db.delete(job)
     db.commit()
     return RedirectResponse("/hr_jobs_list", status_code=303)
+
+
+@app.post("/jobs/{job_id}/best_match")
+async def best_match(job_id: int):
+
+    return RedirectResponse(
+        url=f"/post_job_feedback?job_id={job_id}",
+        status_code=303
+    )

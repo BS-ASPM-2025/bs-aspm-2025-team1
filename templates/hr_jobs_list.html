@@ -289,12 +289,16 @@
               </form>
 
               <!-- VIEW BEST MATCH BUTTON -->
-              <a href="/jobs/{{ j.id }}/best_match"
-                 class="action-btn"
-                 title="View best candidate match">
-                View best match
-              </a>
+                <form method="post"
+                      action="/jobs/{{ j.id }}/best_match"
+                      style="display:inline">
 
+                  <button type="submit"
+                          class="action-btn">
+                    View best match
+                  </button>
+
+                </form>
               <span class="badge">Degree: {{ j.degree }}</span>
               <span class="badge">Experience: {{ j.experience }} yrs</span>
 
