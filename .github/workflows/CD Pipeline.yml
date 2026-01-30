@@ -88,7 +88,7 @@ jobs:
     name: deploy-to-azure
     needs: [build]
     runs-on: ubuntu-latest
-    if: always() && needs.build.result == 'success' && (needs.release.result == 'success' || needs.release.result == 'skipped') && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev')
+    if: always() && needs.build.result == 'success' && (github.event_name == 'pull_request' || github.ref == 'refs/heads/dev')
     environment:
       name: Development
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
@@ -109,4 +109,4 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: "projectmanagement"
-          images: "${{ secrets.DOCKER_USERNAME }}/aspm:${{ needs.release.outputs.version != '' && needs.release.outputs.version || format('team1-{0}-{1}', steps.actor_sanitize.outputs.sanitized_actor, github.run_number) }}"
+          images: "${{ secrets.DOCKER_USERNAME }}/aspm:team1-${{ steps.actor_sanitize.outputs.sanitized_actor }}-${{ github.run_number }}"
