@@ -17,57 +17,29 @@ def clean_text(text: str) -> str:
     text = re.sub(r'[^a-z0-9\s]', '', text)
     return text
 
-# Degree equivalence groups: if job and resume each contain any term from same group, it's a match
-DEGREE_GROUPS = [
-    ["bs", "bachelor", "bachelors", "b.s.", "bsc", "bachelor of science"],
-    ["ms", "master", "masters", "m.s.", "msc", "mba", "master of science"],
-    ["phd", "ph.d.", "doctorate", "doctoral", "d.phil"],
-]
-
-def _skill_in_resume(skill: str, resume_text: str) -> bool:
-    """Check if skill appears in resume with word boundaries (avoids 'java' in 'javascript')."""
-    if not skill or not resume_text:
-        return False
-    # Escape special regex chars (e.g. C++, C#)
-    pattern = r"\b" + re.escape(skill) + r"\b"
-    return bool(re.search(pattern, resume_text, re.IGNORECASE))
-
-def _degree_matches(job_degree: str, resume_text: str) -> bool:
-    """Check if resume satisfies degree requirement, including common aliases (BS/Bachelor, etc.)."""
-    if not job_degree or not resume_text:
-        return False
-    job_clean = clean_text(job_degree)
-    resume_clean = clean_text(resume_text)
-    if job_clean in resume_clean:
-        return True
-    for group in DEGREE_GROUPS:
-        job_has = any(term in job_clean for term in group)
-        resume_has = any(term in resume_clean for term in group)
-        if job_has and resume_has:
-            return True
-    return False
-
 def calculate_match_score(resume_text: str, job: Job) -> float:
     """
     Calculate a match score based on weighted criteria using simple NLP (non-AI/DL).
     """
     scores = {}
 
-    # 1. Skills Score (Keyword matching with word boundaries)
-    # Extract skills from job and check if they exist in resume (avoids "java" in "javascript")
+    # 1. Skills Score (Keyword matching)
+    # Extract skills from job and check if they exist in resume
     if job.required_skills:
-        skills = [s.strip() for s in job.required_skills.split(',') if s.strip()]
+        skills = [s.strip().lower() for s in job.required_skills.split(',') if s.strip()]
         if skills:
-            found_skills = sum(1 for skill in skills if _skill_in_resume(skill, resume_text))
+            resume_lower = resume_text # resume_text.lower()
+            found_skills = sum(1 for skill in skills if skill in resume_lower)
             scores['skills'] = (found_skills / len(skills)) * 100
         else:
             scores['skills'] = 0.0
     else:
         scores['skills'] = 0.0
 
-    # 2. Degree Score (keyword check with common aliases: BS/Bachelor, MS/Master, etc.)
+    # 2. Degree Score (Simple keyword check)
     if job.degree:
-        scores['degree'] = 100.0 if _degree_matches(job.degree, resume_text) else 0.0
+        # Check if any part of the degree requirement is in the resume
+        scores['degree'] = 100.0 if clean_text(job.degree) in clean_text(resume_text) else 0.0
     else:
         scores['degree'] = 0.0
         
@@ -118,8 +90,7 @@ def calculate_tfidf_similarity(text1: str, text2: str) -> float:
         return 100.0
 
     try:
-        # ngram_range=(1,2) catches phrases like "machine learning", "data science"
-        vectorizer = TfidfVectorizer(stop_words='english', ngram_range=(1, 2))
+        vectorizer = TfidfVectorizer(stop_words='english')
         tfidf_matrix = vectorizer.fit_transform([text1, text2])
         similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
         return similarity * 100
