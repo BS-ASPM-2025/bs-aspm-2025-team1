@@ -178,6 +178,28 @@
   transform: scale(0.97);
   transition: opacity 0.35s ease, transform 0.35s ease;
    }
+  .post-btn {
+  text-decoration: none;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  white-space: nowrap;
+  }
+  .post-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+ }
+
+.head-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+ }
 
   @media (max-width: 720px) {
     .grid { grid-template-columns: 1fr; }
@@ -195,9 +217,15 @@
       <h2 class="page-title">Jobs List</h2>
       <p class="page-subtitle">Full report of all jobs currently in the system.</p>
     </div>
-    <div class="count-pill">
-      Total jobs: {{ jobs|length if jobs else 0 }}
-    </div>
+        <div class="head-actions">
+          <a href="/post_job" class="post-btn">
+            + Post another job
+          </a>
+          <div class="count-pill">
+            Total jobs: {{ jobs|length if jobs else 0 }}
+          </div>
+        </div>
+
   </div>
 
   {% if not jobs or jobs|length == 0 %}
