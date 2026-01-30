@@ -34,7 +34,7 @@ from src.security.session import (
 )
 
 from shared import get_db, engine, Base
-from models import Resume, Job, Match, Company
+from models import Resume, Job, Match, Company, hr_job_query
 from src.handlepdf import extract_text_from_pdf
 from src.findMatch import calculate_match_score
 
@@ -308,10 +308,10 @@ async def passcode_submit(
     request: Request,
     password: str = Form(...),
     next: str = Form("/post_job"),
-    db: Session = Depends(get_db),):
-    # next_path = get_safe_next_path(next, default="/post_job")
-    next_path = next,
-    password = password.strip()
+    db: Session = Depends(get_db),
+):
+    password = (password or "").strip()
+    next_path = next  # ✅ בלי פסיק (לא tuple)
 
     if not password:
         return templates.TemplateResponse(
@@ -329,13 +329,17 @@ async def passcode_submit(
             context={"company_name": "ResuMe", "error": "Wrong password. Please try again.", "next": next_path}
         )
 
-    # the RIGHT way (compatible with session.py)
     start_company_session(request, company_id=record.id)
+
+    request.session["company"] = record.company
+
     request.session["company_name"] = record.company
 
     return RedirectResponse(url=next_path, status_code=303)
 
 
+
+#logout--------------------------------------------------------------------
 @app.get("/logout", include_in_schema=False)
 async def logout_route(request: Request):
     """
@@ -343,7 +347,7 @@ async def logout_route(request: Request):
     """
     logout(request)
     return RedirectResponse(url="/", status_code=303)
-#---------------------------------------------------------
+#--------------------------------------------------------------------------
 if __name__ == '__main__':
     import uvicorn
 
@@ -476,16 +480,31 @@ async def post_job_feedback_page(
 
 #hr_jobs_list--------------------------------------------------
 @app.get("/hr_jobs_list", include_in_schema=False)
-async def ht_jobs_list_page(request: Request, db: Session = Depends(get_db)):
-    #company_id = require_company_session(request)
+async def hr_jobs_list(request: Request, db: Session = Depends(get_db)):
+    company_id = require_company_session(request)  # נשאר רק ל-auth
+    company_name = request.session.get("company")
 
-    #company_obj = db.query(Company).filter(Company.id == company_id).first()
+    jobs = (
+        db.query(Job)
+        .filter(Job.company == company_name)
+        .order_by(Job.id.desc())
+        .all()
+    )
 
     return templates.TemplateResponse(
         request=request,
         name="hr_jobs_list.html",
-        context={
-            #"company_name": company_obj.company,
-            #"company": company_obj.company if company_obj else ""
-        }
+        context={"jobs": jobs, "company": company_name}
     )
+
+@app.post("/hr_jobs_list/delete/{job_id}")
+async def delete_job(job_id: int, db: Session = Depends(get_db)):
+    job = db.query(Job).filter(Job.id == job_id).first()
+
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    db.delete(job)
+    db.commit()
+
+    return RedirectResponse("/jobs_list", status_code=303)
