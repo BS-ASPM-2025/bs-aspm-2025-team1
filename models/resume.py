@@ -27,4 +27,4 @@ class Resume(Base):
     id_text = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     # One-time secret token that allows the user to delete this resume later
-    #delete_token = Column(Text, nullable=True, unique=True, index=True)
+    delete_token = Column(Text, nullable=True, unique=True, index=True)
