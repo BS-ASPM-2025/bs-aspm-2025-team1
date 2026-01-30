@@ -131,10 +131,10 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     :return: Redirect to feedback page on success or render upload page with error
     """
     #Validation
-    ALLOWED_TYPES = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
-    MAX_SIZE = 5 * 1024 * 1024  # 5MB
+    allowed_types = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+    max_size = 5 * 1024 * 1024  # 5MB
 
-    if file.content_type not in ALLOWED_TYPES:
+    if file.content_type not in allowed_types:
         return templates.TemplateResponse(
             request=request,
             name="upload_resume.html",
@@ -146,7 +146,7 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     size = file.file.tell()
     file.file.seek(0)
 
-    if size > MAX_SIZE:
+    if size > max_size:
         return templates.TemplateResponse(
             request=request,
             name="upload_resume.html",
