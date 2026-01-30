@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 LOGIN_URL = "/passcode"
 POST_JOB_URL = "/post_job"
+POST_JOB_FEEDBACK_URL = "/post_job_feedback"
 
 # Minimal valid form data for post_job
 JOB_FORM_DATA = {
@@ -73,3 +74,43 @@ def test_post_job_post_value_error_returns_400(client):
 
     assert r.status_code == 400
     assert "Company with id=999 not found" in r.text
+
+
+def test_post_job_feedback_requires_company_session(client):
+    """
+    Tests that post_job_feedback requires authentication.
+    Covers app.py post_job_feedback_page (lines 459-475) - require_company_session.
+    """
+    r = client.get(POST_JOB_FEEDBACK_URL, follow_redirects=False)
+    assert r.status_code in (302, 303)
+    assert "/passcode" in r.headers["location"]
+
+
+def test_post_job_feedback_displays_content(client):
+    """
+    Tests that post_job_feedback page renders with company, candidates, job_title.
+    Covers app.py post_job_feedback_page (lines 459-475) handler body.
+    """
+    # 1. Login and POST job (stores candidate_results, posted_job_title in session)
+    client.post(LOGIN_URL, data={"password": "1234"}, follow_redirects=False)
+    client.post(POST_JOB_URL, data=JOB_FORM_DATA, follow_redirects=False)
+
+    # 2. GET post_job_feedback (exercises post_job_feedback_page handler)
+    r = client.get(POST_JOB_FEEDBACK_URL)
+    assert r.status_code == 200
+    assert "Software Engineer" in r.text
+    assert "Test Company" in r.text
+
+
+def test_post_job_feedback_direct_access_empty_session(client):
+    """
+    Tests post_job_feedback when accessed directly (no prior post_job).
+    Session has no candidate_results or posted_job_title; handler uses pop defaults.
+    Covers app.py post_job_feedback_page (lines 464-465, 471-473).
+    """
+    # Login only, no POST job
+    client.post(LOGIN_URL, data={"password": "1234"}, follow_redirects=False)
+
+    r = client.get(POST_JOB_FEEDBACK_URL)
+    assert r.status_code == 200
+    assert "Test Company" in r.text
