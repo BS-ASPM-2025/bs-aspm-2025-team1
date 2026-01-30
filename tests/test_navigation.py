@@ -4,6 +4,12 @@ Tests for navigation between different pages of the FastAPI application.
 
 """
 
+from unittest.mock import MagicMock
+
+from app import app, get_db
+from tests.conftest import override_get_db
+
+
 def test_index_loads(client):
     """
     Tests that the index page loads successfully.
@@ -33,6 +39,27 @@ def test_passcode_post_redirects_to_post_job(client):
     r = client.post("/passcode", data={"password": "1234"}, follow_redirects=False)
     assert r.status_code in (302, 303)
     assert "/post_job" in r.headers["location"]
+
+
+def test_passcode_post_whitespace_password_shows_error(client):
+    """
+    Tests that submitting whitespace-only password shows the error message.
+    Covers app.py passcode_submit (lines 316-321) when password.strip() yields empty.
+    """
+    r = client.post("/passcode", data={"password": "   "})
+    assert r.status_code == 200
+    assert "Please enter a password." in r.text
+
+
+def test_passcode_post_wrong_password_shows_error(client):
+    """
+    Tests that submitting an incorrect password shows the error message.
+    Covers app.py passcode_submit (lines 325-330) when record is not found.
+    """
+    r = client.post("/passcode", data={"password": "wrong_password"})
+    assert r.status_code == 200
+    assert "Wrong password. Please try again." in r.text
+
 
 def test_post_job_get_requires_company_session(client):
     """
@@ -66,10 +93,32 @@ def test_upload_resume_job_get_loads(client):
 def test_jobs_list_loads(client):
     """
     Tests that the jobs list page loads successfully.
+    Covers app.py jobs_list (lines 369-378) try block.
     """
     r = client.get("/jobs_list")
     assert r.status_code == 200
     assert "Jobs List" in r.text
+
+
+def test_jobs_list_exception_returns_500(client):
+    """
+    Tests that when jobs_list raises an exception, it returns 500 with error message.
+    Covers app.py jobs_list (lines 380-385) except block.
+    """
+    mock_db = MagicMock()
+    mock_db.query.return_value.all.side_effect = Exception("Simulated DB error")
+
+    def mock_get_db():
+        yield mock_db
+
+    try:
+        app.dependency_overrides[get_db] = mock_get_db
+        r = client.get("/jobs_list")
+        assert r.status_code == 500
+        assert "JOBS_LIST ERROR" in r.text
+        assert "Simulated DB error" in r.text
+    finally:
+        app.dependency_overrides[get_db] = override_get_db
 
 
 def test_hr_jobs_list_loads(client):
