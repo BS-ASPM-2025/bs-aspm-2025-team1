@@ -95,3 +95,4 @@ def logout(request: Request) -> None:
     :return: None
     """
     request.session.clear()
+
