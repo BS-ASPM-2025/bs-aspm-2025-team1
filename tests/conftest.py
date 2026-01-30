@@ -8,6 +8,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from models.company import Company
 from shared import Base, get_db
 from app import app
 
@@ -48,5 +49,10 @@ def client():
     """
     Base.metadata.create_all(bind=engine)
     with TestClient(app) as c:
+        with TestingSessionLocal() as db:
+            # Ensure the passcode used in tests exists in the DB
+            if not db.query(Company).filter_by(password="1234").first():
+                db.add(Company(password="1234", company="Test Company"))
+                db.commit()
         yield c
     Base.metadata.drop_all(bind=engine)
