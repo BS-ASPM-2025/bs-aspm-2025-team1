@@ -104,3 +104,13 @@ def test_missing_job_fields_display(client, db_session):
     db_session.delete(job)
     db_session.commit()
 
+
+def test_delete_resume_by_token_invalid(client):
+    """
+    Verifies that accessing delete with an invalid token shows the error message.
+    """
+    response = client.get("/delete_resume_by_token?token=invalid-token-12345")
+    assert response.status_code == 404
+    assert "Resume not found" in response.text
+    assert "invalid" in response.text or "already been used" in response.text
+

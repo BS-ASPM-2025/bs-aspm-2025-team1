@@ -63,12 +63,38 @@ def test_upload_resume_job_get_loads(client):
     assert "Upload Resume" in r.text
 
 
-def test_upload_resume_loads(client):
+def test_jobs_list_loads(client):
     """
-    Tests that the upload resume page loads successfully.
-    :param client: TestClient fixture provided by conftest.py
-    :return: None
+    Tests that the jobs list page loads successfully.
     """
-    r = client.get("/upload_resume")
+    r = client.get("/jobs_list")
     assert r.status_code == 200
-    assert "Upload Resume" in r.text
+    assert "Jobs List" in r.text
+
+
+def test_hr_jobs_list_loads(client):
+    """
+    Tests that the HR jobs list page loads successfully.
+    """
+    r = client.get("/hr_jobs_list")
+    assert r.status_code == 200
+    assert "Jobs List" in r.text
+
+
+def test_logout_redirects_to_home(client):
+    """
+    Tests that logout redirects to the home page.
+    """
+    r = client.get("/logout", follow_redirects=False)
+    assert r.status_code in (302, 303)
+    assert r.headers["location"] == "/"
+
+
+def test_index_has_navigation_links(client):
+    """
+    Tests that the index page contains links to upload resume and post job.
+    """
+    r = client.get("/")
+    assert r.status_code == 200
+    assert "/upload_resume" in r.text
+    assert "/post_job" in r.text
