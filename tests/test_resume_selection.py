@@ -25,7 +25,9 @@ def test_upload_resume_selects_top_matches_above_min_score(client, db_session, m
     - Sort remaining by score desc
     - Keep only top_n (3) matches
     """
-    # Arrange: create jobs
+    # Arrange: clear fixture-seeded jobs so we control the job set
+    db_session.query(Job).delete()
+    db_session.commit()
     titles = ["Job1", "Job2", "Job3", "Job4"]
     for t in titles:
         _create_job(db_session, title=t)
@@ -74,6 +76,8 @@ def test_upload_resume_fallback_when_no_scores_above_min(client, db_session, mon
     When no jobs meet the min_score threshold, the endpoint should fall back
     to returning up to 5 best overall matches (here: all existing jobs).
     """
+    db_session.query(Job).delete()
+    db_session.commit()
     titles = ["JobA", "JobB", "JobC"]
     for t in titles:
         _create_job(db_session, title=t)
@@ -110,6 +114,8 @@ def test_upload_resume_with_many_jobs_limits_to_top_three(client, db_session, mo
     When there are many jobs and most are above the min_score,
     only the top 3 by score should be shown.
     """
+    db_session.query(Job).delete()
+    db_session.commit()
     titles = [f"Job{i}" for i in range(1, 11)]  # 10 jobs
     for t in titles:
         _create_job(db_session, title=t)
@@ -149,6 +155,8 @@ def test_upload_resume_three_jobs_all_below_min_score(client, db_session, monkey
     all of them are below min_score: they should still be returned
     by the fallback.
     """
+    db_session.query(Job).delete()
+    db_session.commit()
     titles = ["Low1", "Low2", "Low3"]
     for t in titles:
         _create_job(db_session, title=t)

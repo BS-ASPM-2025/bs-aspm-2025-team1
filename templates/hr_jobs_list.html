@@ -39,6 +39,33 @@
     white-space: nowrap;
   }
 
+  .head-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .post-btn {
+    text-decoration: none;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.55rem 1rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .post-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+  }
+
   .list {
     display: flex;
     flex-direction: column;
@@ -100,6 +127,26 @@
 
   .delete-btn:hover svg {
     stroke: #b91c1c;
+  }
+
+  .action-btn {
+    text-decoration: none;
+    border: 1px solid var(--border-color);
+    background: var(--primary-color);
+    color: white;
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: transform 0.15s ease, background 0.2s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .action-btn:hover {
+    background: #f3f4f6;
+    transform: translateY(-1px);
   }
 
   .badge {
@@ -173,11 +220,12 @@
     color: var(--text-secondary);
     text-align: center;
   }
+
   .job-card.fade-out {
-  opacity: 0;
-  transform: scale(0.97);
-  transition: opacity 0.35s ease, transform 0.35s ease;
-   }
+    opacity: 0;
+    transform: scale(0.97);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
 
   @media (max-width: 720px) {
     .grid { grid-template-columns: 1fr; }
@@ -192,11 +240,15 @@
   <div class="page-head">
     <div>
       <h1>{{ company }}</h1>
-      <h2> class="page-title">Jobs List</h2>
+      <h2 class="page-title">Jobs List</h2>
       <p class="page-subtitle">Full report of all jobs currently in the system.</p>
     </div>
-    <div class="count-pill">
-      Total jobs: {{ jobs|length if jobs else 0 }}
+
+    <div class="head-actions">
+      <a href="/post_job" class="post-btn">+ Post another job</a>
+      <div class="count-pill">
+        Total jobs: {{ jobs|length if jobs else 0 }}
+      </div>
     </div>
   </div>
 
@@ -216,11 +268,10 @@
             <div class="meta">
 
               <!-- DELETE BUTTON -->
-                <form method="post"
-                      action="/jobs/delete/{{ j.id }}"
-                      class="delete-form">
-
-                  <button type="submit"
+              <form method="post"
+                    action="/jobs/delete/{{ j.id }}"
+                    class="delete-form">
+                <button type="submit"
                         class="delete-btn"
                         title="Delete job">
 
@@ -237,6 +288,17 @@
                 </button>
               </form>
 
+              <!-- VIEW BEST MATCH BUTTON -->
+                <form method="post"
+                      action="/jobs/{{ j.id }}/best_match"
+                      style="display:inline">
+
+                  <button type="submit"
+                          class="action-btn">
+                    View best match
+                  </button>
+
+                </form>
               <span class="badge">Degree: {{ j.degree }}</span>
               <span class="badge">Experience: {{ j.experience }} yrs</span>
 
@@ -282,7 +344,7 @@
   {% endif %}
 </div>
 
-    <script>
+<script>
 document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".delete-form").forEach(form => {
@@ -307,5 +369,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 </script>
-
 {% endblock %}

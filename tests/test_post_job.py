@@ -1,9 +1,29 @@
 """
 
-Tests for the /post_job endpoint to ensure it requires a company session.
+Tests for the /post_job endpoint to ensure it requires a company session
+and covers app.py post_job handler (lines 421-454).
 
 """
 # client fixture is provided by conftest.py
+
+from unittest.mock import patch
+
+LOGIN_URL = "/passcode"
+POST_JOB_URL = "/post_job"
+POST_JOB_FEEDBACK_URL = "/post_job_feedback"
+
+# Minimal valid form data for post_job
+JOB_FORM_DATA = {
+    "title": "Software Engineer",
+    "degree": "Bachelor",
+    "experience": "3",
+    "required_skills": "Python, FastAPI",
+    "job_text": "We are looking for a developer...",
+    "skills_weight": "25",
+    "degree_weight": "25",
+    "experience_weight": "25",
+    "weight_general": "25",
+}
 
 
 def test_post_job_post_requires_company_session(client):
@@ -12,16 +32,85 @@ def test_post_job_post_requires_company_session(client):
     :param client: TestClient fixture provided by conftest.py
     :return: None
     """
-    job_data = {
-        "title": "Software Engineer",
-        "company": "Tech Corp",
-        "degree": "Bachelor",
-        "experience": "3",
-        "required_skills": "Python, FastApi",
-        "job_text": "We are looking for a developer..."
-    }
-
-    r = client.post("/post_job", data=job_data, follow_redirects=False)
+    r = client.post("/post_job", data=JOB_FORM_DATA, follow_redirects=False)
 
     assert r.status_code in (302, 303)
     assert r.headers["location"] == "/passcode?next=/post_job"
+
+
+def test_post_job_post_success_redirects_to_feedback(client):
+    """
+    Tests that authenticated POST creates a job and redirects to post_job_feedback.
+    Covers app.py post_job (lines 421-454) happy path.
+    """
+    # 1. Login (conftest ensures password "1234" exists for Test Company)
+    client.post(LOGIN_URL, data={"password": "1234"}, follow_redirects=False)
+
+    # 2. POST job
+    r = client.post(POST_JOB_URL, data=JOB_FORM_DATA, follow_redirects=False)
+
+    assert r.status_code == 303
+    assert r.headers["location"] == "/post_job_feedback"
+
+    # 3. Follow redirect and verify feedback page
+    r2 = client.get(r.headers["location"])
+    assert r2.status_code == 200
+    assert "Software Engineer" in r2.text or "Test Company" in r2.text
+
+
+def test_post_job_post_value_error_returns_400(client):
+    """
+    Tests that when create_offer raises ValueError, handler returns 400.
+    Covers app.py post_job (lines 435-436) except block.
+    """
+    # 1. Login
+    client.post(LOGIN_URL, data={"password": "1234"}, follow_redirects=False)
+
+    # 2. Mock create_offer to raise ValueError
+    with patch("app._job_service.create_offer") as mock_create:
+        mock_create.side_effect = ValueError("Company with id=999 not found")
+
+        r = client.post(POST_JOB_URL, data=JOB_FORM_DATA)
+
+    assert r.status_code == 400
+    assert "Company with id=999 not found" in r.text
+
+
+def test_post_job_feedback_requires_company_session(client):
+    """
+    Tests that post_job_feedback requires authentication.
+    Covers app.py post_job_feedback_page (lines 459-475) - require_company_session.
+    """
+    r = client.get(POST_JOB_FEEDBACK_URL, follow_redirects=False)
+    assert r.status_code in (302, 303)
+    assert "/passcode" in r.headers["location"]
+
+
+def test_post_job_feedback_displays_content(client):
+    """
+    Tests that post_job_feedback page renders with company, candidates, job_title.
+    Covers app.py post_job_feedback_page (lines 459-475) handler body.
+    """
+    # 1. Login and POST job (stores candidate_results, posted_job_title in session)
+    client.post(LOGIN_URL, data={"password": "1234"}, follow_redirects=False)
+    client.post(POST_JOB_URL, data=JOB_FORM_DATA, follow_redirects=False)
+
+    # 2. GET post_job_feedback (exercises post_job_feedback_page handler)
+    r = client.get(POST_JOB_FEEDBACK_URL)
+    assert r.status_code == 200
+    assert "Software Engineer" in r.text
+    assert "Test Company" in r.text
+
+
+def test_post_job_feedback_direct_access_empty_session(client):
+    """
+    Tests post_job_feedback when accessed directly (no prior post_job).
+    Session has no candidate_results or posted_job_title; handler uses pop defaults.
+    Covers app.py post_job_feedback_page (lines 464-465, 471-473).
+    """
+    # Login only, no POST job
+    client.post(LOGIN_URL, data={"password": "1234"}, follow_redirects=False)
+
+    r = client.get(POST_JOB_FEEDBACK_URL)
+    assert r.status_code == 200
+    assert "Test Company" in r.text

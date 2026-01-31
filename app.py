@@ -34,7 +34,7 @@ from src.security.session import (
 )
 
 from shared import get_db, engine, Base
-from models import Resume, Job, Match, Company
+from models import Resume, Job, Match, Company, hr_job_query
 from src.handlepdf import extract_text_from_pdf
 from src.findMatch import calculate_match_score
 
@@ -131,10 +131,10 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     :return: Redirect to feedback page on success or render upload page with error
     """
     #Validation
-    ALLOWED_TYPES = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
-    MAX_SIZE = 5 * 1024 * 1024  # 5MB
+    allowed_types = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+    max_size = 5 * 1024 * 1024  # 5MB
 
-    if file.content_type not in ALLOWED_TYPES:
+    if file.content_type not in allowed_types:
         return templates.TemplateResponse(
             request=request,
             name="upload_resume.html",
@@ -146,7 +146,7 @@ async def upload_resume(request: Request, file: UploadFile = File(...), db: Sess
     size = file.file.tell()
     file.file.seek(0)
 
-    if size > MAX_SIZE:
+    if size > max_size:
         return templates.TemplateResponse(
             request=request,
             name="upload_resume.html",
@@ -308,10 +308,10 @@ async def passcode_submit(
     request: Request,
     password: str = Form(...),
     next: str = Form("/post_job"),
-    db: Session = Depends(get_db),):
-    # next_path = get_safe_next_path(next, default="/post_job")
-    next_path = next,
-    password = password.strip()
+    db: Session = Depends(get_db),
+):
+    password = (password or "").strip()
+    next_path = next  # ✅ בלי פסיק (לא tuple)
 
     if not password:
         return templates.TemplateResponse(
@@ -329,13 +329,17 @@ async def passcode_submit(
             context={"company_name": "ResuMe", "error": "Wrong password. Please try again.", "next": next_path}
         )
 
-    # the RIGHT way (compatible with session.py)
     start_company_session(request, company_id=record.id)
+
+    request.session["company"] = record.company
+
     request.session["company_name"] = record.company
 
     return RedirectResponse(url=next_path, status_code=303)
 
 
+
+#logout--------------------------------------------------------------------
 @app.get("/logout", include_in_schema=False)
 async def logout_route(request: Request):
     """
@@ -343,7 +347,7 @@ async def logout_route(request: Request):
     """
     logout(request)
     return RedirectResponse(url="/", status_code=303)
-#---------------------------------------------------------
+#--------------------------------------------------------------------------
 if __name__ == '__main__':
     import uvicorn
 
@@ -476,16 +480,45 @@ async def post_job_feedback_page(
 
 #hr_jobs_list--------------------------------------------------
 @app.get("/hr_jobs_list", include_in_schema=False)
-async def ht_jobs_list_page(request: Request, db: Session = Depends(get_db)):
-    #company_id = require_company_session(request)
+async def hr_jobs_list(request: Request, db: Session = Depends(get_db)):
+    company_id = require_company_session(request)  # נשאר רק ל-auth
+    company_name = request.session.get("company")
 
-    #company_obj = db.query(Company).filter(Company.id == company_id).first()
+    jobs = (
+        db.query(Job)
+        .filter(Job.company == company_name)
+        .order_by(Job.id.desc())
+        .all()
+    )
 
     return templates.TemplateResponse(
         request=request,
         name="hr_jobs_list.html",
-        context={
-            #"company_name": company_obj.company,
-            #"company": company_obj.company if company_obj else ""
-        }
+        context={"jobs": jobs, "company": company_name}
+    )
+
+
+@app.post("/hr_jobs_list/delete/{job_id}")
+async def delete_job(request: Request, job_id: int, db: Session = Depends(get_db)):
+    require_company_session(request)
+    company_name = request.session.get("company")
+
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    if job.company != company_name:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    db.delete(job)
+    db.commit()
+    return RedirectResponse("/hr_jobs_list", status_code=303)
+
+
+@app.post("/jobs/{job_id}/best_match")
+async def best_match(job_id: int):
+
+    return RedirectResponse(
+        url=f"/post_job_feedback?job_id={job_id}",
+        status_code=303
     )
