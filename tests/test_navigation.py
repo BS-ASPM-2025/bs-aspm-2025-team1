@@ -147,3 +147,38 @@ def test_index_has_navigation_links(client):
     assert r.status_code == 200
     assert "/upload_resume" in r.text
     assert "/post_job" in r.text
+
+
+def test_post_job_feedback_back_to_post_job_button_navigates(client):
+    """
+    Tests that the Post Job feedback page has a "Back to Post Job" button
+    that navigates to the post_job page when clicked.
+    """
+    # 1. Login and reach post_job_feedback
+    client.post("/passcode", data={"password": "1234"}, follow_redirects=False)
+    client.post(
+        "/post_job",
+        data={
+            "title": "Software Engineer",
+            "degree": "Bachelor",
+            "experience": "3",
+            "required_skills": "Python",
+            "job_text": "Build APIs",
+            "skills_weight": "25",
+            "degree_weight": "25",
+            "experience_weight": "25",
+            "weight_general": "25",
+        },
+        follow_redirects=False,
+    )
+
+    # 2. Verify the feedback page contains the Back to Post Job link
+    r = client.get("/post_job_feedback")
+    assert r.status_code == 200
+    assert 'href="/post_job"' in r.text
+    assert "Back to Post Job" in r.text
+
+    # 3. Follow the link and verify we land on post_job page
+    r2 = client.get("/post_job")
+    assert r2.status_code == 200
+    assert "post_job" in r2.text or "Post" in r2.text
