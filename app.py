@@ -498,6 +498,44 @@ async def hr_jobs_list(request: Request, db: Session = Depends(get_db)):
     )
 
 
+@app.get("/hr_jobs_list/{job_id}/best_match", include_in_schema=False)
+async def job_best_match(
+    request: Request,
+    job_id: int,
+    company_id: int = Depends(require_company_session),
+    db: Session = Depends(get_db),
+):
+    """Show best matching candidates (resumes) for a given job."""
+    company_name = request.session.get("company")
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    if job.company != company_name:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    resumes = db.query(Resume).all()
+    candidate_results = []
+    for r in resumes:
+        score = calculate_match_score(r.resume_text, job)
+        candidate_results.append({
+            "resume_id": r.id,
+            "resume_name": r.id_text or f"Resume #{r.id}",
+            "score": score,
+        })
+    candidate_results.sort(key=lambda x: x["score"], reverse=True)
+
+    company_obj = db.query(Company).filter(Company.id == company_id).first()
+    return templates.TemplateResponse(
+        request=request,
+        name="post_job_feedback.html",
+        context={
+            "company_name": company_obj.company if company_obj else APP_NAME,
+            "candidates": candidate_results[:9],
+            "job_title": job.title or "(untitled)",
+        },
+    )
+
+
 @app.post("/hr_jobs_list/delete/{job_id}")
 async def delete_job(request: Request, job_id: int, db: Session = Depends(get_db)):
     require_company_session(request)
@@ -513,12 +551,3 @@ async def delete_job(request: Request, job_id: int, db: Session = Depends(get_db
     db.delete(job)
     db.commit()
     return RedirectResponse("/hr_jobs_list", status_code=303)
-
-
-@app.post("/jobs/{job_id}/best_match")
-async def best_match(job_id: int):
-
-    return RedirectResponse(
-        url=f"/post_job_feedback?job_id={job_id}",
-        status_code=303
-    )
